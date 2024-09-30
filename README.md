@@ -1,2 +1,6 @@
 # GTA_CV
-CV project
+## Team members
+### Dmitriy Demidov
+### Dmitriy Stolyarov
+### Dmitriy Faranosov
+### Ramil Badyrtenov
