@@ -24,4 +24,7 @@ def creatingIntegForm(image, size1, size2):
                 left = image[i][j]
             else:
                 left = image[i][j] + newMatrix[i][j - 1][1]
+
+            newMatrix[i][j] = (up, left)
+
     return newMatrix
