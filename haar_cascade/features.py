@@ -1,6 +1,6 @@
 from featureNode import FeatureType
 
-cntTypesWeakFeatures = 2
+cntTypesFeatures = 2
 
 class Feature:
     type: FeatureType
@@ -48,11 +48,11 @@ class WeakFeature1(Feature):
         intenceWhite: int = 0
         intenceBlack: int = 0
 
-        intenceBlack += matrix[self.blackx2][self.blacky2][0] - matrix[self.blackx1][self.blacky1][0]
-        intenceBlack += matrix[self.blackx2][self.blacky2][1] - matrix[self.blackx1][self.blacky1][1]
+        intenceBlack = matrix[self.blackx2][self.blacky2][2] + matrix[self.blackx1][self.blacky1 - 1][2]
+        intenceBlack -= (matrix[self.blackx2][self.blacky1 - 1][2] + matrix[self.blackx1 - 1][self.blacky2][2])
 
-        intenceWhite += matrix[self.whitex2][self.whitey2][0] - matrix[self.whitex1][self.whitey1][0]
-        intenceWhite += matrix[self.whitex2][self.whitey2][1] - matrix[self.whitex1][self.whitey1][1]
+        intenceWhite = matrix[self.whitex2][self.whitey2][2] + matrix[self.whitex1][self.whitey1 - 1][2]
+        intenceWhite -= (matrix[self.whitex2][self.whitey1 - 1][2] + matrix[self.whitex1 - 1][self.whitey2][2])
 
         return abs(intenceWhite - intenceBlack)
 
@@ -96,4 +96,15 @@ class WeakFeature2(Feature):
 
         return self.intence
 
+    def getIntenceIntegMatrix(self, matrix):
+        intenceWhite: int = 0
+        intenceBlack: int = 0
+
+        intenceBlack = matrix[self.blackx2][self.blacky2][2] + matrix[self.blackx1][self.blacky1 - 1][2]
+        intenceBlack -= (matrix[self.blackx2][self.blacky1 - 1][2] + matrix[self.blackx1 - 1][self.blacky2][2])
+
+        intenceWhite = matrix[self.whitex2][self.whitey2][2] + matrix[self.whitex1][self.whitey1 - 1][2]
+        intenceWhite -= (matrix[self.whitex2][self.whitey1 - 1][2] + matrix[self.whitex1 - 1][self.whitey2][2])
+
+        return abs(intenceWhite - intenceBlack)
 

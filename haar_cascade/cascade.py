@@ -1,3 +1,5 @@
+import math
+
 import cv2 as cv
 import os
 
@@ -7,86 +9,87 @@ from features import *
 from readyFeatureNode import readyFeatureNode
 from imageMaking import *
 
-cntWeakFeatures = 0
+listFeatSize = 0
 
-def getWeakNode(type, img, x, y):
+def getWeakNode(type, matr, x, y):
+
     match type:
         case 1:
-            node = FeatureNode(x, y, type, WeakFeature1(x, y).getIntens(img))
+            node = FeatureNode(x, y, type, WeakFeature1(x, y).getIntenceIntegMatrix(matr))
             return node
         case 2:
-            node = FeatureNode(x, y, type, WeakFeature2(x, y).getIntens(img))
+            node = FeatureNode(x, y, type, WeakFeature2(x, y).getIntenceIntegMatrix(matr))
             return node
 
-def getMostInteresting(img, x, y):
-    newNode = FeatureNode(0, 0, 0, 0)
-    for type in range(1, cntTypesWeakFeatures + 1):
-        node = getWeakNode(type, img, x, y)
-        if newNode.type == 0 or node.intency > newNode.intency:
-            newNode = node
-    return newNode
+def getFeaturesInPoint(matr, x, y):
+    listOfFeat: list[FeatureNode] = []
+    global listFeatSize
+    listFeatSize += cntTypesFeatures
+    for type in range(1, cntTypesFeatures + 1):
+        node = getWeakNode(type, matr, x, y)
+        listOfFeat.append(node)
+    return listOfFeat
 
 
-def getWeakImageInfo(img):
+def getImageInfo(img):
+    global listFeatSize
+    listFeatSize = 0
     imageInfo = TrainImageInfo()
 
     maxS = 180
     minS = 20
-    step = 10
-    global cntWeakFeatures
-    cntWeakFeatures = int((maxS - minS) / step + 1) * int((maxS - minS) / step + 1)
-    cntWeakFeatures = int(cntWeakFeatures)
+    step = 5
+
+    matr = creatingIntegForm(img, 200, 200)
 
     for x in range(minS, maxS + 1, step):
         for y in range(minS, maxS + 1, step):
-            imageInfo.addWeakNode(getMostInteresting(img, x, y))
+            imageInfo.addNodes(getFeaturesInPoint(matr, x, y))
 
     return imageInfo
 
 
-def getTrueInfo():
+def getTrueInfo(trueDic):
     infoArray = []
     infoWeakArray = []
     oldDir = os.getcwd()
-    os.chdir("trueCars")
+    os.chdir(trueDic + "trueCars")
     cntImg = sum([len(files) for r, d, files in os.walk(os.getcwd())])
     infoArray.append(cntImg)
-    global cntWeakFeatures
+    global listFeatSize
 
     for i in range(1, cntImg + 1):
         fileName = "car" + str(i) + ".jpg"
-        infoWeakNode = getWeakImageInfo(createImg(fileName))
-        infoWeakArray.append(infoWeakNode)
+        infoNode = getImageInfo(createImg(fileName))
+        infoWeakArray.append(infoNode)
     infoArray.append(infoWeakArray)
 
     os.chdir(oldDir)
     return infoArray
 
 
-def getFalseinfo():
+def getFalseinfo(falseDic):
     infoArray = []
     infoWeakArray = []
     oldDir = os.getcwd()
-    os.chdir("falseCars")
+    os.chdir(falseDic + "falseCars")
     cntImg = sum([len(files) for r, d, files in os.walk(os.getcwd())])
     infoArray.append(cntImg)
-    global cntWeakFeatures
 
     for i in range(1, cntImg + 1):
         fileName = "car" + str(i) + ".jpg"
-        infoWeakNode = getWeakImageInfo(createImg(fileName))
-        infoWeakArray.append(infoWeakNode)
+        infoNode = getImageInfo(createImg(fileName))
+        infoWeakArray.append(infoNode)
     infoArray.append(infoWeakArray)
 
     os.chdir(oldDir)
     return infoArray
 
 
-def getAverageWeakInfo(array: list[TrainImageInfo], size):
+def getAverageInfo(array: list[TrainImageInfo], size):
     readyInfoList: list[readyFeatureNode] = []
-    global cntWeakFeatures
 
-    for i in range(cntWeakFeatures):
+    for i in range(listFeatSize):
         aver = 0
         maxCnt = 0
         maxType = 0
@@ -95,9 +98,9 @@ def getAverageWeakInfo(array: list[TrainImageInfo], size):
         type: FeatureType
         dictTypes: dict[FeatureType, int] = {}
         for j in range(size):
-            x = array[j].weakFeaturesArray[i].x
-            y = array[j].weakFeaturesArray[i].y
-            type = array[j].weakFeaturesArray[i].type
+            x = array[j].FeaturesArray[i].x
+            y = array[j].FeaturesArray[i].y
+            type = array[j].FeaturesArray[i].type
             if type in dictTypes.keys():
                 cnt = dictTypes[type]
                 dictTypes[type] = cnt + 1
@@ -111,13 +114,14 @@ def getAverageWeakInfo(array: list[TrainImageInfo], size):
                     maxType = type
 
         for j in range(size):
-            type = array[j].weakFeaturesArray[i].type
+            type = array[j].FeaturesArray[i].type
             if type == maxType:
-                inten = array[j].weakFeaturesArray[i].intency
-                aver += inten
+                inten = array[j].FeaturesArray[i].intency
+                aver += inten * inten
 
         if maxCnt != 0 :
             aver/=maxCnt
+            aver = int(math.sqrt(aver))
         else:
             aver = 0
 
@@ -127,14 +131,14 @@ def getAverageWeakInfo(array: list[TrainImageInfo], size):
     return readyInfoList
 
 
-def analyseInfo():
-    trueInfoArray = getTrueInfo()
-    falseInfoArray = getFalseinfo()
-    trueReadyInfo = getAverageWeakInfo(trueInfoArray[1], trueInfoArray[0])
-    falseReadyInfo = getAverageWeakInfo(falseInfoArray[1], falseInfoArray[0])
+def analyseInfo(trueDic, falseDic):
+    trueInfoArray = getTrueInfo(trueDic)
+    falseInfoArray = getFalseinfo(falseDic)
+    trueReadyInfo = getAverageInfo(trueInfoArray[1], trueInfoArray[0])
+    falseReadyInfo = getAverageInfo(falseInfoArray[1], falseInfoArray[0])
     weakPercent = 0.1
 
-    for i in range(cntWeakFeatures):
+    for i in range(listFeatSize):
         if trueReadyInfo[i].type == falseReadyInfo[i].type:
             if (trueReadyInfo[i].average*(1+weakPercent) >= falseReadyInfo[i].average
                     and trueReadyInfo[i].average*(1-weakPercent) <= falseReadyInfo[i].average):
@@ -143,13 +147,19 @@ def analyseInfo():
     return trueReadyInfo
 
 
-def detect():
-    array = analyseInfo()
-    for i in range(0, cntWeakFeatures):
+def writeInfo(array: list[readyFeatureNode], fileToWrite):
+    file = open(fileToWrite, mode='w')
+    global listFeatSize
+    for i in range(0, listFeatSize):
         if array[i].isExclusive:
-            print(array[i].average)
+            file.write(f'{array[i].x}\n{array[i].y}\n{int(array[i].type.value)}\n{int(array[i].average)}\n\n')
+    file.close()
 
-detect()
+
+
+def learn(trueDic, falseDic, fileToWrite):
+    array = analyseInfo(trueDic, falseDic)
+    writeInfo(array, fileToWrite)
 
 
 
