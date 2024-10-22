@@ -10,11 +10,11 @@ class FeatureNode:
     type : FeatureType
     x : int
     y : int
-    intency = 0
+    intensity = 0
 
-    def __init__(self, x, y, type, intency):
+    def __init__(self, x, y, type, intensity):
         self.type = FeatureType(type)
         self.x = x
         self.y = y
-        self.intency = intency
+        self.intensity = intensity
 

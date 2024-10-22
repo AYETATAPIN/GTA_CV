@@ -1,13 +1,11 @@
 import math
-
-import cv2 as cv
 import os
 
 from TrainImageInfo import *
 from featureNode import FeatureNode
 from features import *
-from readyFeatureNode import readyFeatureNode
 from imageMaking import *
+from readyFeatureNode import readyFeatureNode
 
 listFeatSize = 0
 
@@ -68,7 +66,7 @@ def getTrueInfo(trueDic):
     return infoArray
 
 
-def getFalseinfo(falseDic):
+def getFalseInfo(falseDic):
     infoArray = []
     infoWeakArray = []
     oldDir = os.getcwd()
@@ -116,8 +114,8 @@ def getAverageInfo(array: list[TrainImageInfo], size):
         for j in range(size):
             type = array[j].FeaturesArray[i].type
             if type == maxType:
-                inten = array[j].FeaturesArray[i].intency
-                aver += inten * inten
+                intensity = array[j].FeaturesArray[i].intensity
+                aver += intensity * intensity
 
         if maxCnt != 0 :
             aver/=maxCnt
@@ -133,16 +131,16 @@ def getAverageInfo(array: list[TrainImageInfo], size):
 
 def analyseInfo(trueDic, falseDic):
     trueInfoArray = getTrueInfo(trueDic)
-    falseInfoArray = getFalseinfo(falseDic)
+    falseInfoArray = getFalseInfo(falseDic)
     trueReadyInfo = getAverageInfo(trueInfoArray[1], trueInfoArray[0])
     falseReadyInfo = getAverageInfo(falseInfoArray[1], falseInfoArray[0])
     weakPercent = 0.1
 
     for i in range(listFeatSize):
         if trueReadyInfo[i].type == falseReadyInfo[i].type:
-            if (trueReadyInfo[i].average*(1+weakPercent) >= falseReadyInfo[i].average
-                    and trueReadyInfo[i].average*(1-weakPercent) <= falseReadyInfo[i].average):
-                trueReadyInfo[i].setEclusiveness(False)
+            if (trueReadyInfo[i].average*(1 + weakPercent) >= falseReadyInfo[i].average
+                    >= trueReadyInfo[i].average*(1 - weakPercent)):
+                trueReadyInfo[i].setExclusiveness(False)
 
     return trueReadyInfo
 

@@ -1,5 +1,4 @@
 import cv2 as cv
-from cv2 import Mat
 
 
 def createImg(fileName):
@@ -10,12 +9,11 @@ def createImg(fileName):
 
 def creatingIntegForm(image, size1, size2):
     newMatrix: list[list[(int, int, int)]] = []
+    endMatrix: list[list[int]] = []
     for i in range(size1):
         newMatrix.append([])
+        endMatrix.append([])
         for j in range(size2):
-            left: int = 0
-            up: int = 0
-            all: int = 0
             if i == 0:
                 up = int(image[i][j])
             else:
@@ -38,5 +36,6 @@ def creatingIntegForm(image, size1, size2):
                     all = int(image[i][j]) + int(newMatrix[i-1][j][0]) + int(newMatrix[i][j-1][2])
 
             newMatrix[i].append((up, left, all))
+            endMatrix[i].append(all)
 
-    return newMatrix
+    return endMatrix
