@@ -1,7 +1,6 @@
 import math
 import os
 
-
 from TrainImageInfo import *
 from featureNode import FeatureNode
 from features import *
@@ -15,7 +14,7 @@ sizeH = 200
 
 step = 5
 
-def getWeakNode(type, matr, x, y):
+def getNode(type, matr, x, y):
 
     match type:
         case 1:
@@ -54,7 +53,7 @@ def getFeaturesInPoint(matr, x, y):
     global listFeatSize
     listFeatSize += cntTypesFeatures
     for type in range(1, cntTypesFeatures + 1):
-        node = getWeakNode(type, matr, x, y)
+        node = getNode(type, matr, x, y)
         listOfFeat.append(node)
     return listOfFeat
 
@@ -67,8 +66,8 @@ def getImageInfo(img):
 
     matr = creatingIntegForm(img, sizeH, sizeW)
 
-    for x in range(20, sizeW + 1, step):
-        for y in range(20, sizeH + 1, step):
+    for y in range(20, sizeW - 19, step):
+        for x in range(20, sizeH - 19, step):
             imageInfo.addNodes(getFeaturesInPoint(matr, x, y))
 
     return imageInfo
@@ -85,8 +84,10 @@ def getTrueInfo(trueDic):
 
     for i in range(1, cntImg + 1):
         fileName = "car" + str(i) + ".jpg"
+        print(f"carNumber = {i}\n")
         infoNode = getImageInfo(createImg(fileName, sizeW, sizeH))
         infoWeakArray.append(infoNode)
+
     infoArray.append(infoWeakArray)
 
     os.chdir(oldDir)
@@ -97,13 +98,20 @@ def getFalseInfo(falseDic):
     infoArray = []
     infoWeakArray = []
     oldDir = os.getcwd()
-    os.chdir(falseDic + "falseCars")
+    os.chdir(falseDic)
     cntImg = sum([len(files) for r, d, files in os.walk(os.getcwd())])
     infoArray.append(cntImg)
 
-    for i in range(1, cntImg + 1):
+    for i in range(0, cntImg):
         fileName = "wrongPic" + str(i) + ".jpg"
-        infoNode = getImageInfo(createImg(fileName, sizeW, sizeH))
+        print(f"falseNum = {i}")
+        image = createImg(fileName, sizeW, sizeH)
+
+        if image is None:
+            print(f"No file {fileName}\n")
+            exit(1)
+
+        infoNode = getImageInfo(image)
         infoWeakArray.append(infoNode)
     infoArray.append(infoWeakArray)
 
