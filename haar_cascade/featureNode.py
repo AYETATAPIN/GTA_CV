@@ -13,7 +13,6 @@ class FeatureType(Enum):
     SIMPLE9 = 9
     SIMPLE10 = 10
     SIMPLE11 = 11
-    SIMPLE12 = 12
 
 class FeatureNode:
     type : FeatureType
