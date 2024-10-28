@@ -1,12 +1,9 @@
 from featureNode import FeatureType
 
-cntTypesFeatures = 12
+cntTypesFeatures = 10
 
 class Feature:
     type: FeatureType
-
-# Р”РІСѓС…РїРѕР»РѕСЃРЅС‹Р№ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№ РїСЂРёР·РЅР°Рє РҐР°Р°СЂР°.
-# Р­С‚РѕС‚ РїСЂРёР·РЅР°Рє СЃРѕСЃС‚РѕРёС‚ РёР· РґРІСѓС… РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹С… РѕР±Р»Р°СЃС‚РµР№: РІРµСЂС…РЅРµР№ Р±РµР»РѕР№ Рё РЅРёР¶РЅРµР№ С‡РµСЂРЅРѕР№
 
 class WeakFeature1(Feature):
     whitex1: int
@@ -31,20 +28,6 @@ class WeakFeature1(Feature):
         self.whitey2 = y - 1
         self.type = FeatureType.SIMPLE1
 
-    def getIntens(self, img):
-        intensityWhite: int = 0
-        intensityBlack: int = 0
-
-        for x in range(self.whitex1, self.whitex1 + 1):
-            for y in range(self.whitey1, self.whitey2 + 1):
-                intensityWhite += img[x][y]
-
-        for x in range(self.blackx1, self.blackx1 + 1):
-            for y in range(self.blacky1, self.blacky2 + 1):
-                intensityBlack += img[x][y]
-        self.intensity = abs(intensityWhite - intensityBlack)
-
-        return self.intensity
 
     def getIntenceIntegMatrix(self, matrix):
 
@@ -57,8 +40,7 @@ class WeakFeature1(Feature):
         self.intensity = abs(intensityWhite - intensityBlack)
         return abs(intensityWhite - intensityBlack)
 
-# Р”РІСѓС…РїРѕР»РѕСЃРЅС‹Р№ РІРµСЂС‚РёРєР°Р»СЊРЅС‹Р№ РїСЂРёР·РЅР°Рє РҐР°Р°СЂР°
-# Р­С‚РѕС‚ РїСЂРёР·РЅР°Рє СЃРѕСЃС‚РѕРёС‚ РёР· РґРІСѓС… РІРµСЂС‚РёРєР°Р»СЊРЅС‹С… РѕР±Р»Р°СЃС‚РµР№: Р»РµРІР°СЏ Р±РµР»Р°СЏ Рё РїСЂР°РІР°СЏ С‡РµСЂРЅР°СЏ.
+
 
 class WeakFeature2(Feature):
     whitex1: int
@@ -83,22 +65,7 @@ class WeakFeature2(Feature):
         self.whitey2 = y + 9
         self.type = FeatureType.SIMPLE2
 
-    def getIntens(self, img):
-        intensityWhite: int = 0
-        intensityBlack: int = 0
-
-        for x in range(self.whitex1, self.whitex1 + 1):
-            for y in range(self.whitey1, self.whitey2 + 1):
-                intensityWhite += img[x][y]
-
-        for x in range(self.blackx1, self.blackx1 + 1):
-            for y in range(self.blacky1, self.blacky2 + 1):
-                intensityBlack += img[x][y]
-        self.intensity = abs(intensityWhite - intensityBlack)
-
-        return self.intensity
-
-    def getIntenceIntegMatrix(self, matrix):
+    def getIntensityIntegMatrix(self, matrix):
 
         intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
         intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
@@ -109,9 +76,9 @@ class WeakFeature2(Feature):
         self.intensity = abs(intensityWhite - intensityBlack)
         return abs(intensityWhite - intensityBlack)
 
-# РўСЂРµС…РїРѕР»РѕСЃРЅС‹Р№ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№ РїСЂРёР·РЅР°Рє РҐР°Р°СЂР°
-# Р­С‚РѕС‚ РїСЂРёР·РЅР°Рє СЃРѕСЃС‚РѕРёС‚ РёР· С‚СЂРµС… РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹С… РїРѕР»РѕСЃ: РІРµСЂС…РЅСЏСЏ Р±РµР»Р°СЏ, СЃСЂРµРґРЅСЏСЏ С‡РµСЂРЅР°СЏ Рё РЅРёР¶РЅСЏСЏ Р±РµР»Р°СЏ.
 
+# Трехполосный горизонтальный признак Хаара
+# Этот признак состоит из трех горизонтальных полос: верхняя белая, средняя черная и нижняя белая.
 class WeakFeature3(Feature):
     whitex1: int
     whitex2: int
@@ -127,42 +94,28 @@ class WeakFeature3(Feature):
         self.whitex1 = x - 10
         self.whitex2 = x + 9
         self.whitey1 = y - 5
-        self.whitey2 = y - 3
+        self.whitey2 = y + 5
         self.blackx1 = x - 10
         self.blackx2 = x + 9
         self.blacky1 = y - 2
-        self.blacky2 = y + 1
+        self.blacky2 = y + 2
         self.type = FeatureType.SIMPLE3
 
-    def getIntensity(self, img):
-        intensityWhite = 0
-        intensityBlack = 0
 
-        for x in range(self.whitex1, self.whitex2 + 1):
-            for y in range(self.whitey1, self.whitey2 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.blackx1, self.blackx2 + 1):
-            for y in range(self.blacky1, self.blacky2 + 1):
-                intensityBlack += img[x][y]
-        self.intensity = abs(intensityWhite - intensityBlack)
-
-        return self.intensity
-
-    def getIntencIntegMatrix(self, matrix):
-
+    def getIntensityIntegMatrix(self, matrix):
         intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
         intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
-        
+
         intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
         intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
-
-        self.intensity = abs(intensityWhite - intensityBlack)
+        self.intensity = abs(intensityWhite - intensityBlack * 2)
         return self.intensity
 
-# РўСЂРµС…РїРѕР»РѕСЃРЅС‹Р№ РІРµСЂС‚РёРєР°Р»СЊРЅС‹Р№ РїСЂРёР·РЅР°Рє РҐР°Р°СЂР°
-# Р­С‚РѕС‚ РїСЂРёР·РЅР°Рє СЃРѕСЃС‚РѕРёС‚ РёР· С‚СЂРµС… РІРµСЂС‚РёРєР°Р»СЊРЅС‹С… РїРѕР»РѕСЃ: СЃСЂРµРґРЅСЏСЏ С‡РµСЂРЅР°СЏ, РґРІРµ Р±РѕРєРѕРІС‹Рµ Р±РµР»С‹Рµ.
 
+
+
+# Трехполосный вертикальный признак Хаара
+# Этот признак состоит из трех вертикальных полос: средняя черная, две боковые белые.
 class WeakFeature4(Feature):
     whitex1: int
     whitex2: int
@@ -175,50 +128,38 @@ class WeakFeature4(Feature):
     intensity = 0
 
     def __init__(self, x, y):
-        self.whitex1 = x - 10
-        self.whitex2 = x - 6
+        self.whitex1 = x - 5
+        self.whitex2 = x + 5
         self.whitey1 = y - 10
         self.whitey2 = y + 9
-        self.blackx1 = x - 5
-        self.blackx2 = x - 1
+        self.blackx1 = x - 2
+        self.blackx2 = x + 2
         self.blacky1 = y - 10
         self.blacky2 = y + 9
         self.type = FeatureType.SIMPLE4
 
-    def getIntensity(self, img):
-        intensityWhite = 0
-        intensityBlack = 0
 
-        for x in range(self.whitex1, self.whitex2 + 1):
-            for y in range(self.whitey1, self.whitey2 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.blackx1, self.blackx2 + 1):
-            for y in range(self.blacky1, self.blacky2 + 1):
-                intensityBlack += img[x][y]
-        self.intensity = abs(intensityWhite - intensityBlack)
 
-        return self.intensity
-    
-    def getIntencIntegMatrix(self, matrix):
-
+    def getIntensityIntegMatrix(self, matrix):
         intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
         intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
-        
+
         intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
         intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
-
-        self.intensity = abs(intensityWhite - intensityBlack)
+        self.intensity = abs(intensityWhite - intensityBlack * 2)
         return self.intensity
 
-# Р§РµС‚С‹СЂРµС…РїРѕР»РѕСЃРЅС‹Р№ РіРѕСЂРёР·РѕРЅР°С‚Р»СЊРЅС‹Р№ РїСЂРёР·РЅР°Рє РҐР°Р°СЂР°
-# Р­С‚РѕС‚ РїСЂРёР·РЅР°Рє СЃРѕСЃС‚РѕРёС‚ РёР· С‡РµС‚С‹СЂРµС… РІРµСЂС‚РёРєР°Р»СЊРЅС‹С… РїРѕР»РѕСЃ: РґРІРµ Р±РµР»С‹Рµ Рё РґРІРµ С‡РµСЂРЅС‹Рµ, С‡РµСЂРµРґСѓСЋС‰РёРµСЃСЏ РјРµР¶РґСѓ СЃРѕР±РѕР№.
-    
+
+# Четырехполосный горизонатльный признак Хаара
+# Этот признак состоит из четырех горизонтальных полос: две белые и две черные, чередующиеся между собой.
+
 class WeakFeature5(Feature):
     whitex1: int
     whitex2: int
     whitey1: int
     whitey2: int
+    whitey1_2: int
+    whitey2_2: int
     blackx1: int
     blackx2: int
     blacky1: int
@@ -230,60 +171,38 @@ class WeakFeature5(Feature):
         self.whitex2 = x + 9
         self.whitey1 = y - 10
         self.whitey2 = y - 6
-        self.whitey1_2 = y + 3 
+        self.whitey1_2 = y + 3
         self.whitey2_2 = y + 7
         self.blackx1 = x - 10
         self.blackx2 = x + 9
-        self.blacky1 = y - 5  
-        self.blacky2 = y + 2  
+        self.blacky1 = y - 10
+        self.blacky2 = y + 10
         self.type = FeatureType.SIMPLE5
 
-    def getIntensity(self, img):
-        intensityWhite = 0
-        intensityBlack = 0
 
-        for x in range(self.whitex1, self.whitex2 + 1):
-            for y in range(self.whitey1, self.whitey2 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.whitex1, self.whitex2 + 1):
-            for y in range(self.whitey1_2, self.whitey2_2 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.blackx1, self.blackx2 + 1):
-            for y in range(self.blacky1, self.blacky2 + 1):
-                intensityBlack += img[x][y]
-                
-        for x in range(self.blackx1, self.blackx2 + 1):
-            for y in range(self.blacky1 + 3, self.blacky2 + 3):
-                intensityBlack += img[x][y]
-        self.intensity = abs(intensityWhite - intensityBlack)
-
-        return self.intensity
-
-    def getIntenceIntegMatrix(self, matrix):
-
+    def getIntensityIntegMatrix(self, matrix):
         intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2]
-        intensityBlack = matrix[self.blackx2][self.blacky2 + 3] + matrix[self.blackx1][self.blacky1 + 2]
-        intensityBlack -= matrix[self.blackx2][self.blacky1 + 2] + matrix[self.blackx1 - 1][self.blacky2 + 3]
+        intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
 
         intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
-        intensityWhite -= matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2]
-        intensityWhite = matrix[self.whitex2][self.whitey2_2] + matrix[self.whitex1][self.whitey1_2 - 1]
-        intensityWhite -= matrix[self.whitex2][self.whitey1_2 - 1] + matrix[self.whitex1 - 1][self.whitey2_2]
+        intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
 
-        self.intensity = abs(intensityWhite - intensityBlack)
+        intensityWhite += matrix[self.whitex2][self.whitey2_2] + matrix[self.whitex1][self.whitey1_2 - 1]
+        intensityWhite -= (matrix[self.whitex2][self.whitey1_2 - 1] + matrix[self.whitex1 - 1][self.whitey2_2])
+
+        self.intensity = abs(intensityWhite * 2 - intensityBlack)
         return self.intensity
 
-# Р§РµС‚С‹СЂРµС…РїРѕР»РѕСЃРЅС‹Р№ РІРµСЂС‚РёРєР°Р»СЊРЅС‹Р№ РїСЂРёР·РЅР°Рє РҐР°Р°СЂР°
-# Р­С‚РѕС‚ РїСЂРёР·РЅР°Рє СЃРѕСЃС‚РѕРёС‚ РёР· С‡РµС‚С‹СЂРµС… РІРµСЂС‚РёРєР°Р»СЊРЅС‹С… РїРѕР»РѕСЃ: РґРІРµ Р±РµР»С‹Рµ Рё РґРІРµ С‡РµСЂРЅС‹Рµ, С‡РµСЂРµРґСѓСЋС‰РёРµСЃСЏ РјРµР¶РґСѓ СЃРѕР±РѕР№.
 
+# Четырехполосный вертикальный признак Хаара
+# Этот признак состоит из четырех вертикальных полос: две белые и две черные, чередующиеся между собой.
 class WeakFeature6(Feature):
     whitex1: int
     whitex2: int
     whitey1: int
     whitey2: int
+    whitex1_2: int
+    whitex2_2: int
     blackx1: int
     blackx2: int
     blacky1: int
@@ -295,97 +214,39 @@ class WeakFeature6(Feature):
         self.whitex2 = x - 6
         self.whitey1 = y - 10
         self.whitey2 = y + 9
-        self.blackx1 = x - 5
-        self.blackx2 = x - 1
+        self.whitex1_2 = x
+        self.whitex2_2 = x + 4
+        self.blackx1 = x - 10
+        self.blackx2 = x + 10
         self.blacky1 = y - 10
         self.blacky2 = y + 9
         self.type = FeatureType.SIMPLE6
 
-    def getIntensity(self, img):
-        intensityWhite = 0
-        intensityBlack = 0
-
-        for x in range(self.whitex1, self.whitex2 + 1):
-            for y in range(self.whitey1, self.whitey2 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.blackx1, self.blackx2 + 1):
-            for y in range(self.blacky1, self.blacky2 + 1):
-                intensityBlack += img[x][y]
-        self.intensity = abs(intensityWhite - intensityBlack)
-
-        return self.intensity
-
-    def getIntencIntegMatrix(self, matrix):
-
+    def getIntensityIntegMatrix(self, matrix):
         intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
         intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
-        
+
         intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
         intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
 
-        self.intensity = abs(intensityWhite - intensityBlack)
+        intensityWhite += matrix[self.whitex2_2][self.whitey2] + matrix[self.whitex1_2][self.whitey1 - 1]
+        intensityWhite -= (matrix[self.whitex2_2][self.whitey1 - 1] + matrix[self.whitex1_2 - 1][self.whitey2])
+
+        self.intensity = abs(intensityWhite * 2 - intensityBlack)
         return self.intensity
 
-# Р”РІСѓС…РїРѕР»РѕСЃРЅС‹Р№ РґРёР°РіРѕРЅР°Р»СЊРЅС‹Р№ РїСЂРёР·РЅР°Рє РҐР°Р°СЂР°
-# Р­С‚РѕС‚ РїСЂРёР·РЅР°Рє СЃРѕСЃС‚РѕРёС‚ РёР· РґРІСѓС… РґРёР°РіРѕРЅР°Р»СЊРЅС‹С… РѕР±Р»Р°СЃС‚РµР№: РѕРґРЅР° Р±РµР»Р°СЏ, РґСЂСѓРіР°СЏ С‡РµСЂРЅР°СЏ.
 
+# Четырехугольный признак Хаара
+# Этот признак состоит из четырех квадратов.
 class WeakFeature7(Feature):
     whitex1: int
     whitex2: int
     whitey1: int
     whitey2: int
-    blackx1: int
-    blackx2: int
-    blacky1: int
-    blacky2: int
-    intensity = 0
-
-    def __init__(self, x, y):
-        self.whitex1 = x - 10
-        self.whitex2 = x + 9
-        self.whitey1 = y - 10
-        self.whitey2 = y - 1
-        self.blackx1 = x - 10
-        self.blackx2 = x + 9
-        self.blacky1 = y
-        self.blacky2 = y + 9
-        self.type = FeatureType.SIMPLE7
-
-    def getIntensity(self, img):
-        intensityWhite = 0
-        intensityBlack = 0
-
-        for x in range(self.whitex1, self.whitex2 + 1):
-            for y in range(self.whitey1, self.whitey2 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.blackx1, self.blackx2 + 1):
-            for y in range(self.blacky1, self.blacky2 + 1):
-                intensityBlack += img[x][y]
-        self.intensity = abs(intensityWhite - intensityBlack)
-
-        return self.intensity
-
-    def getIntencIntegMatrix(self, matrix):
-
-        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
-        
-        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
-        intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
-
-        self.intensity = abs(intensityWhite - intensityBlack)
-        return self.intensity
-
-# Р§РµС‚С‹СЂРµС…СѓРіРѕР»СЊРЅС‹Р№ РїСЂРёР·РЅР°Рє РҐР°Р°СЂР°
-# Р­С‚РѕС‚ РїСЂРёР·РЅР°Рє СЃРѕСЃС‚РѕРёС‚ РёР· С‡РµС‚С‹СЂРµС… РєРІР°РґСЂР°С‚РѕРІ: РґРІР° РІРµСЂС…РЅРёС… вЂ” Р±РµР»С‹С…, РґРІР° РЅРёР¶РЅРёС… вЂ” С‡РµСЂРЅС‹С….
-
-class WeakFeature8(Feature):
-    whitex1: int
-    whitex2: int
-    whitey1: int
-    whitey2: int
+    whitex1_2: int
+    whitex2_2: int
+    whitey1_2: int
+    whitey2_2: int
     blackx1: int
     blackx2: int
     blacky1: int
@@ -395,44 +256,36 @@ class WeakFeature8(Feature):
     def __init__(self, x, y):
         self.whitex1 = x - 5
         self.whitex2 = x - 1
-        self.whitey1 = y - 10
-        self.whitey2 = y - 6
-        self.blackx1 = x
+        self.whitey1 = y - 5
+        self.whitey2 = y - 1
+        self.whitex1_2 = x
+        self.whitex2_2 = x + 4
+        self.whitey1_2 = y
+        self.whitey2_2 = y + 4
+        self.blackx1 = x - 5
         self.blackx2 = x + 4
         self.blacky1 = y - 5
-        self.blacky2 = y - 1
-        self.type = FeatureType.SIMPLE8
+        self.blacky2 = y + 4
+        self.type = FeatureType.SIMPLE7
 
-    def getIntensity(self, img):
-        intensityWhite = 0
-        intensityBlack = 0
-
-        for x in range(self.whitex1, self.whitex2 + 1):
-            for y in range(self.whitey1, self.whitey2 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.blackx1, self.blackx2 + 1):
-            for y in range(self.blacky1, self.blacky2 + 1):
-                intensityBlack += img[x][y]
-        self.intensity = abs(intensityWhite - intensityBlack)
-
-        return self.intensity
-
-    def getIntencIntegMatrix(self, matrix):
-
+    def getIntensityIntegMatrix(self, matrix):
         intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
         intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
-        
+
         intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
         intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
 
-        self.intensity = abs(intensityWhite - intensityBlack)
+        intensityWhite += matrix[self.whitex2_2][self.whitey2] + matrix[self.whitex1_2][self.whitey1 - 1]
+        intensityWhite -= (matrix[self.whitex2_2][self.whitey1 - 1] + matrix[self.whitex1_2 - 1][self.whitey2])
+
+        self.intensity = abs(intensityWhite * 2 - intensityBlack)
         return self.intensity
-    
-# РџСЏС‚РёРїРѕР»РѕСЃРЅС‹Р№ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№ РїСЂРёР·РЅР°Рє РҐР°Р°СЂР° 
-# Р­С‚РѕС‚ РїСЂРёР·РЅР°Рє СЃРѕСЃС‚РѕРёС‚ РёР· РїСЏС‚Рё РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹С… РїРѕР»РѕСЃ: С‚СЂРё Р±РµР»С‹Рµ РїРѕР»РѕСЃС‹ С‡РµСЂРµРґСѓСЋС‚СЃСЏ СЃ РґРІСѓРјСЏ С‡РµСЂРЅС‹РјРё РїРѕР»РѕСЃР°РјРё.
-    
-class WeakFeature9(Feature):
+
+
+# Пятиполосный горизонтальный признак Хаара
+# Этот признак состоит из пяти горизонтальных полос: три белые полосы чередуются с двумя черными полосами.
+
+class WeakFeature8(Feature):
     whitex1: int
     whitex2: int
     whitey1_1: int
@@ -452,67 +305,84 @@ class WeakFeature9(Feature):
     def __init__(self, x, y):
         self.whitex1 = x - 10
         self.whitex2 = x + 9
-        self.whitey1_1 = y - 10  
-        self.whitey2_1 = y - 6
-        self.whitey1_2 = y - 2   
-        self.whitey2_2 = y + 2
-        self.whitey1_3 = y + 6  
-        self.whitey2_3 = y + 10
+        self.whitey1_1 = y - 10
+        self.whitey2_1 = y - 7
+        self.whitey1_2 = y - 2
+        self.whitey2_2 = y + 1
+        self.whitey1_3 = y + 6
+        self.whitey2_3 = y + 9
         self.blackx1 = x - 10
         self.blackx2 = x + 9
-        self.blacky1_1 = y - 5  
+        self.blacky1_1 = y - 6
         self.blacky2_1 = y - 3
-        self.blacky1_2 = y + 3  
+        self.blacky1_2 = y + 2
         self.blacky2_2 = y + 5
-        self.type = FeatureType.SIMPLE9
+        self.type = FeatureType.SIMPLE8
 
-    def getIntensity(self, img):
-        intensityWhite = 0
-        intensityBlack = 0
 
-        for x in range(self.whitex1, self.whitex2 + 1):
-            for y in range(self.whitey1_1, self.whitey2_1 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.whitex1, self.whitex2 + 1):
-            for y in range(self.whitey1_2, self.whitey2_2 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.whitex1, self.whitex2 + 1):
-            for y in range(self.whitey1_3, self.whitey2_3 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.blackx1, self.blackx2 + 1):
-            for y in range(self.blacky1_1, self.blacky2_1 + 1):
-                intensityBlack += img[x][y]
-                
-        for x in range(self.blackx1, self.blackx2 + 1):
-            for y in range(self.blacky1_2, self.blacky2_2 + 1):
-                intensityBlack += img[x][y]
-        self.intensity = abs(intensityWhite - intensityBlack)
 
-        return self.intensity
-    
-    def getIntenceIntegMatrix(self, matrix):
-
+    def getIntensityIntegMatrix(self, matrix):
         intensityBlack = matrix[self.blackx2][self.blacky2_1] + matrix[self.blackx1][self.blacky1_1 - 1]
         intensityBlack -= matrix[self.blackx2][self.blacky1_1 - 1] + matrix[self.blackx1 - 1][self.blacky2_1]
-        intensityBlack = matrix[self.blackx2][self.blacky2_2] + matrix[self.blackx1][self.blacky1_2 - 1]
+        intensityBlack += matrix[self.blackx2][self.blacky2_2] + matrix[self.blackx1][self.blacky1_2 - 1]
         intensityBlack -= matrix[self.blackx2][self.blacky1_2 - 1] + matrix[self.blackx1 - 1][self.blacky2_2]
 
         intensityWhite = matrix[self.whitex2][self.whitey2_3] + matrix[self.whitex1][self.whitey1_3 - 1]
         intensityWhite -= matrix[self.whitex2][self.whitey1_3 - 1] + matrix[self.whitex1 - 1][self.whitey2_3]
-        intensityWhite = matrix[self.whitex2][self.whitey2_2] + matrix[self.whitex1][self.whitey1_2 - 1]
+        intensityWhite += matrix[self.whitex2][self.whitey2_2] + matrix[self.whitex1][self.whitey1_2 - 1]
         intensityWhite -= matrix[self.whitex2][self.whitey1_2 - 1] + matrix[self.whitex1 - 1][self.whitey2_2]
-        intensityWhite = matrix[self.whitex2][self.whitey2_1] + matrix[self.whitex1][self.whitey1_1 - 1]
+        intensityWhite += matrix[self.whitex2][self.whitey2_1] + matrix[self.whitex1][self.whitey1_1 - 1]
         intensityWhite -= matrix[self.whitex2][self.whitey1_1 - 1] + matrix[self.whitex1 - 1][self.whitey2_1]
 
         self.intensity = abs(intensityWhite - intensityBlack)
         return self.intensity
 
-# РџСЏС‚РёРїРѕР»РѕСЃРЅС‹Р№ РІРµСЂС‚РёРєР°Р»СЊРЅС‹Р№ РїСЂРёР·РЅР°Рє РҐР°Р°СЂР° 
-# Р­С‚РѕС‚ РїСЂРёР·РЅР°Рє СЃРѕСЃС‚РѕРёС‚ РёР· РїСЏС‚Рё РІРµСЂС‚РёРєР°Р»СЊРЅС‹С… РїРѕР»РѕСЃ: РґРІРµ РєСЂР°Р№РЅРёРµ Р±РµР»С‹Рµ, РѕРґРЅР° С‡РµСЂРЅР°СЏ РІ С†РµРЅС‚СЂРµ Рё РґРІРµ С‡РµСЂРЅС‹Рµ РјРµР¶РґСѓ РЅРёРјРё
 
+# Пятиполосный вертикальный признак Хаара
+# Этот признак состоит из пяти вертикальных полос: две крайние белые, одна черная в центре и две черные между ними
+class WeakFeature9(Feature):
+    whitex1: int
+    whitex2: int
+    whitey1: int
+    whitey2: int
+    whitex1_2: int
+    whitex2_2: int
+    blackx1: int
+    blackx2: int
+    blacky1: int
+    blacky2: int
+    intensity = 0
+
+    def __init__(self, x, y):
+        self.whitex1 = x - 6
+        self.whitex2 = x - 3
+        self.whitey1 = y - 5
+        self.whitey2 = y + 4
+        self.whitex1_2 = x + 2
+        self.whitex2_2 = x + 5
+        self.blackx1 = x - 10
+        self.blackx2 = x + 9
+        self.blacky1 = y - 5
+        self.blacky2 = y + 4
+        self.type = FeatureType.SIMPLE9
+
+
+    def getIntensityIntegMatrix(self, matrix):
+        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
+        intensityBlack -= matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2]
+        
+        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
+        intensityWhite -= matrix[self.whitex2][self.whitey1 - 1] - matrix[self.whitex1 - 1][self.whitey2]
+
+        intensityWhite += matrix[self.whitex2_2][self.whitey2] + matrix[self.whitex1_2][self.whitey1 - 1]
+        intensityWhite -= matrix[self.whitex2_2][self.whitey1 - 1] - matrix[self.whitex1_2 - 1][self.whitey2]
+
+        self.intensity = abs(intensityWhite - intensityBlack)
+        return self.intensity
+
+
+# Широкополстный горизонтальный признак Хаара
+# Этот признак состоит из одной широкой белой полосы слева и черной полосы справа.
 class WeakFeature10(Feature):
     whitex1: int
     whitex2: int
@@ -526,142 +396,17 @@ class WeakFeature10(Feature):
 
     def __init__(self, x, y):
         self.whitex1 = x - 10
-        self.whitex2 = x - 6
+        self.whitex2 = x + 4
         self.whitey1 = y - 10
         self.whitey2 = y + 9
-        self.blackx1 = x - 5
-        self.blackx2 = x - 1
+        self.blackx1 = x + 5
+        self.blackx2 = x + 9
         self.blacky1 = y - 10
         self.blacky2 = y + 9
-        self.blackx1_2 = x + 1
-        self.blackx2_2 = x + 5
         self.type = FeatureType.SIMPLE10
 
-    def getIntensity(self, img):
-        intensityWhite = 0
-        intensityBlack = 0
 
-        for x in range(self.whitex1, self.whitex2 + 1):
-            for y in range(self.whitey1, self.whitey2 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.blackx1, self.blackx2 + 1):
-            for y in range(self.blacky1, self.blacky2 + 1):
-                intensityBlack += img[x][y]
-                
-        for x in range(self.blackx1_2, self.blackx2_2 + 1):
-            for y in range(self.blacky1, self.blacky2 + 1):
-                intensityBlack += img[x][y]
-        self.intensity = abs(intensityWhite - intensityBlack)
-
-        return self.intensity
-    
-    def getIntenceIntegMatrix(self, matrix):
-
-        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2]
-        intensityBlack = matrix[self.blackx2_2][self.blacky2] + matrix[self.blackx1_2][self.blacky1 - 1]
-        intensityBlack -= matrix[self.blackx2_2][self.blacky1 - 1] + matrix[self.blackx1_2 - 1][self.blacky2]
-
-        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1] 
-        intensityWhite -= matrix[self.whitex2][self.whitey1 - 1] - matrix[self.whitex1 - 1][self.whitey2]
-
-        self.intensity = abs(intensityWhite - intensityBlack)
-        return self.intensity
-
-# РЁРёСЂРѕРєРѕРїРѕР»СЃС‚РЅС‹Р№ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅС‹Р№ РїСЂРёР·РЅР°Рє РҐР°Р°СЂР° 
-# Р­С‚РѕС‚ РїСЂРёР·РЅР°Рє СЃРѕСЃС‚РѕРёС‚ РёР· РѕРґРЅРѕР№ С€РёСЂРѕРєРѕР№ Р±РµР»РѕР№ РїРѕР»РѕСЃС‹ СЃР»РµРІР° Рё С‡РµСЂРЅРѕР№ РїРѕР»РѕСЃС‹ СЃРїСЂР°РІР°.
-
-class WeakFeature11(Feature):
-    whitex1: int
-    whitex2: int
-    whitey1: int
-    whitey2: int
-    blackx1: int
-    blackx2: int
-    blacky1: int
-    blacky2: int
-    intensity = 0
-
-    def __init__(self, x, y):
-        self.whitex1 = x - 20
-        self.whitex2 = x + 0
-        self.whitey1 = y - 10
-        self.whitey2 = y + 9
-        self.blackx1 = x + 1
-        self.blackx2 = x + 19
-        self.blacky1 = y - 10
-        self.blacky2 = y + 9
-        self.type = FeatureType.SIMPLE11
-
-    def getIntensity(self, img):
-        intensityWhite = 0
-        intensityBlack = 0
-
-        for x in range(self.whitex1, self.whitex2 + 1):
-            for y in range(self.whitey1, self.whitey2 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.blackx1, self.blackx2 + 1):
-            for y in range(self.blacky1, self.blacky2 + 1):
-                intensityBlack += img[x][y]
-        self.intensity = abs(intensityWhite - intensityBlack)
-
-        return self.intensity
-
-    def getIntenceIntegMatrix(self, matrix):
-
-        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
-
-        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
-        intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
-
-        self.intensity = abs(intensityWhite - intensityBlack)
-        return self.intensity
-
-# РџРµСЂРµРєСЂРµСЃС‚РЅС‹Р№ РїСЂРёР·РЅР°Рє РҐР°Р°СЂР°
-# Р­С‚РѕС‚ РїСЂРёР·РЅР°Рє СЃРѕСЃС‚РѕРёС‚ РёР· РґРІСѓС… РїРµСЂРµСЃРµРєР°СЋС‰РёС…СЃСЏ Р»РёРЅРёР№: РѕРґРЅР° Р±РµР»Р°СЏ РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅР°СЏ Рё РѕРґРЅР° С‡РµСЂРЅР°СЏ РІРµСЂС‚РёРєР°Р»СЊРЅР°СЏ.
-
-class WeakFeature12(Feature):
-    white_x1: int
-    white_x2: int
-    white_y1: int
-    white_y2: int
-    black_x1: int
-    black_x2: int
-    black_y1: int
-    black_y2: int
-    intensity = 0
-    
-    def __init__(self, x, y):
-        self.white_x1 = x - 10
-        self.white_x2 = x + 10
-        self.white_y1 = y - 1
-        self.white_y2 = y + 1
-        self.black_x1 = x - 1
-        self.black_x2 = x + 1
-        self.black_y1 = y - 10
-        self.black_y2 = y + 10
-        self.type = FeatureType.SIMPLE12
-
-    def getIntensity(self, img):
-        intensityWhite = 0
-        intensityBlack = 0
-
-        for x in range(self.white_x1, self.white_x2 + 1):
-            for y in range(self.white_y1, self.white_y2 + 1):
-                intensityWhite += img[x][y]
-                
-        for x in range(self.black_x1, self.black_x2 + 1):
-            for y in range(self.black_y1, self.black_y2 + 1):
-                intensityBlack += img[x][y]
-        self.intensity = abs(intensityWhite - intensityBlack)
-        
-        return self.intensity
-
-    def getIntenceIntegMatrix(self, matrix):
-
+    def getIntensityIntegMatrix(self, matrix):
         intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
         intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
 
