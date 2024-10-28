@@ -1,8 +1,8 @@
-from cascade import learn
+from cascade import learn, makeWrongInfo
 
 
 def main():
-    learn("", "", "model.txt")
+    makeWrongInfo("falseCars", 300, 200, "wrongInfo300")
     print("learn compl")
 
 if __name__ == "__main__":
