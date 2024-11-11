@@ -105,7 +105,6 @@ def getTrueInfo():
         infoTempArray.append(infoNode)
 
         info = next(images)
-        info = None
 
     infoArray.append(cntImages)
     infoArray.append(infoTempArray)
