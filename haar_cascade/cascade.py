@@ -76,8 +76,8 @@ def getImageInfo(img, bb):
     matr = creatingIntegForm(img, img.shape[0], img.shape[1])
 
 
-    for y in range(1, 10, 1):
-        for x in range(1, 10, 1):
+    for y in range(2, 9, 1):
+        for x in range(2, 9, 1):
             xToFeat = int(x1 + (x2 - x1) /10 * step * x)
             yToFeat = int(y1 + (y2 - y1) / 10 * step * y)
             imageInfo.addNodes(getFeaturesInPoint(matr, xToFeat, yToFeat, x * step, y * step))
@@ -105,7 +105,6 @@ def getTrueInfo():
         infoTempArray.append(infoNode)
 
         info = next(images)
-        info = None
 
     infoArray.append(cntImages)
     infoArray.append(infoTempArray)
