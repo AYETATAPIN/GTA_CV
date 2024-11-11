@@ -58,8 +58,8 @@ def checkWindow(matr, x1, y1, x2, y2,  info: list[list[readyFeatureNode]], listN
     for node in info[listNum]:
         y = y1 + int(node.y * (y2-y1))
         x = x1 + int(node.x * (x2-x1))
-        if (y <= maxSizeH
-            and x <= maxSizeW):
+        if (y + 20 <= maxSizeH
+            and x + 20 <= maxSizeW):
             curFeat = getNode(node.type.value, matr, x, y, node.x, node.y)
             if (curFeat.intensity > node.average * 1.4
                 or curFeat.intensity < node.average * 0.6):
@@ -88,12 +88,13 @@ def moving(info, matr):
         y = 0
 
         while (x + startSizeW * coef <= maxSizeW):
+            y = 0
             while(y + startSizeH * coef <= maxSizeH):
                 if checkWindow(matr, x, y, x + startSizeW * coef, y + startSizeH * coef,  info, 0):
                     rectList.append((x, y, x + int(startSizeW * coef), y + int(startSizeW * coef)))
-                y += startSizeH * coef
+                y += step
+            x += step
 
-            x+=startSizeW * coef
 
         coef += 0.1
 

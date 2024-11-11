@@ -37,11 +37,11 @@ class WeakFeature1(Feature):
 
     def getIntenceIntegMatrix(self, matrix):
 
-        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
+        intensityBlack = matrix[self.blacky2][self.blackx2] + matrix[self.blacky1][self.blackx1 - 1]
+        intensityBlack -= (matrix[self.blacky2][self.blackx1 - 1] + matrix[self.blacky1 - 1][self.blackx2])
 
-        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
-        intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
+        intensityWhite = matrix[self.whitey2][self.whitex2] + matrix[self.whitey1][self.whitex1 - 1]
+        intensityWhite -= (matrix[self.whitey2][self.whitex1 - 1] + matrix[self.whitey1 - 1][self.whitex2])
 
         self.intensity = abs(intensityWhite - intensityBlack)
         return abs(intensityWhite - intensityBlack)
@@ -77,11 +77,11 @@ class WeakFeature2(Feature):
 
     def getIntensityIntegMatrix(self, matrix):
 
-        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
+        intensityBlack = matrix[self.blacky2][self.blackx2] + matrix[self.blacky1][self.blackx1 - 1]
+        intensityBlack -= (matrix[self.blacky2][self.blackx1 - 1] + matrix[self.blacky1 - 1][self.blackx2])
 
-        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
-        intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
+        intensityWhite = matrix[self.whitey2][self.whitex2] + matrix[self.whitey1][self.whitex1 - 1]
+        intensityWhite -= (matrix[self.whitey2][self.whitex1 - 1] + matrix[self.whitey1 - 1][self.whitex2])
 
         self.intensity = abs(intensityWhite - intensityBlack)
         return abs(intensityWhite - intensityBlack)
@@ -117,11 +117,11 @@ class WeakFeature3(Feature):
 
 
     def getIntensityIntegMatrix(self, matrix):
-        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
+        intensityBlack = matrix[self.blacky2][self.blackx2] + matrix[self.blacky1][self.blackx1 - 1]
+        intensityBlack -= (matrix[self.blacky2][self.blackx1 - 1] + matrix[self.blacky1 - 1][self.blackx2])
 
-        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
-        intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
+        intensityWhite = matrix[self.whitey2][self.whitex2] + matrix[self.whitey1][self.whitex1 - 1]
+        intensityWhite -= (matrix[self.whitey2][self.whitex1 - 1] + matrix[self.whitey1 - 1][self.whitex2])
         self.intensity = abs(intensityWhite - intensityBlack * 2)
         return self.intensity
 
@@ -159,11 +159,11 @@ class WeakFeature4(Feature):
 
 
     def getIntensityIntegMatrix(self, matrix):
-        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
+        intensityBlack = matrix[self.blacky2][self.blackx2] + matrix[self.blacky1][self.blackx1 - 1]
+        intensityBlack -= (matrix[self.blacky2][self.blackx1 - 1] + matrix[self.blacky1 - 1][self.blackx2])
 
-        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
-        intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
+        intensityWhite = matrix[self.whitey2][self.whitex2] + matrix[self.whitey1][self.whitex1 - 1]
+        intensityWhite -= (matrix[self.whitey2][self.whitex1 - 1] + matrix[self.whitey1 - 1][self.whitex2])
         self.intensity = abs(intensityWhite - intensityBlack * 2)
         return self.intensity
 
@@ -203,14 +203,14 @@ class WeakFeature5(Feature):
 
 
     def getIntensityIntegMatrix(self, matrix):
-        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
+        intensityBlack = matrix[self.blacky2][self.blackx2] + matrix[self.blackx1][self.blacky1 - 1]
+        intensityBlack -= (matrix[self.blacky2][self.blackx1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
 
-        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
-        intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
+        intensityWhite = matrix[self.whitey2][self.whitex2] + matrix[self.whitex1][self.whitey1 - 1]
+        intensityWhite -= (matrix[self.whitey2][self.whitex1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
 
-        intensityWhite += matrix[self.whitex2][self.whitey2_2] + matrix[self.whitex1][self.whitey1_2 - 1]
-        intensityWhite -= (matrix[self.whitex2][self.whitey1_2 - 1] + matrix[self.whitex1 - 1][self.whitey2_2])
+        intensityWhite += matrix[self.whitey2_2][self.whitex2] + matrix[self.whitey1_2][self.whitex1 - 1]
+        intensityWhite -= (matrix[self.whitey1_2][self.whitex2 - 1] + matrix[self.whitey2_2 - 1][self.whitex1])
 
         self.intensity = abs(intensityWhite * 2 - intensityBlack)
         return self.intensity
@@ -249,14 +249,14 @@ class WeakFeature6(Feature):
         self.type = FeatureType.SIMPLE6
 
     def getIntensityIntegMatrix(self, matrix):
-        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
+        intensityBlack = matrix[self.blacky2][self.blackx2] + matrix[self.blackx1][self.blacky1 - 1]
+        intensityBlack -= (matrix[self.blacky2][self.blackx1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
 
-        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
-        intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
+        intensityWhite = matrix[self.whitey2][self.whitex2] + matrix[self.whitex1][self.whitey1 - 1]
+        intensityWhite -= (matrix[self.whitey2][self.whitex1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
 
-        intensityWhite += matrix[self.whitex2_2][self.whitey2] + matrix[self.whitex1_2][self.whitey1 - 1]
-        intensityWhite -= (matrix[self.whitex2_2][self.whitey1 - 1] + matrix[self.whitex1_2 - 1][self.whitey2])
+        intensityWhite += matrix[self.whitey2][self.whitex2_2] + matrix[self.whitey1][self.whitex1_2 - 1]
+        intensityWhite -= (matrix[self.whitey1][self.whitex1_2 - 1] + matrix[self.whitey2 - 1][self.whitex2_2])
 
         self.intensity = abs(intensityWhite * 2 - intensityBlack)
         return self.intensity
@@ -299,14 +299,14 @@ class WeakFeature7(Feature):
         self.type = FeatureType.SIMPLE7
 
     def getIntensityIntegMatrix(self, matrix):
-        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
+        intensityBlack = matrix[self.blacky2][self.blackx2] + matrix[self.blackx1][self.blacky1 - 1]
+        intensityBlack -= (matrix[self.blacky2][self.blackx1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
 
-        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
-        intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
+        intensityWhite = matrix[self.whitey2][self.whitex2] + matrix[self.whitex1][self.whitey1 - 1]
+        intensityWhite -= (matrix[self.whitey2][self.whitex1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
 
-        intensityWhite += matrix[self.whitex2_2][self.whitey2] + matrix[self.whitex1_2][self.whitey1 - 1]
-        intensityWhite -= (matrix[self.whitex2_2][self.whitey1 - 1] + matrix[self.whitex1_2 - 1][self.whitey2])
+        intensityWhite += matrix[self.whitey2][self.whitex2_2] + matrix[self.whitey1][self.whitex1_2 - 1]
+        intensityWhite -= (matrix[self.whitey1][self.whitex1_2 - 1] + matrix[self.whitey2 - 1][self.whitex2_2])
 
         self.intensity = abs(intensityWhite * 2 - intensityBlack)
         return self.intensity
@@ -356,17 +356,17 @@ class WeakFeature8(Feature):
 
 
     def getIntensityIntegMatrix(self, matrix):
-        intensityBlack = matrix[self.blackx2][self.blacky2_1] + matrix[self.blackx1][self.blacky1_1 - 1]
-        intensityBlack -= matrix[self.blackx2][self.blacky1_1 - 1] + matrix[self.blackx1 - 1][self.blacky2_1]
-        intensityBlack += matrix[self.blackx2][self.blacky2_2] + matrix[self.blackx1][self.blacky1_2 - 1]
-        intensityBlack -= matrix[self.blackx2][self.blacky1_2 - 1] + matrix[self.blackx1 - 1][self.blacky2_2]
+        intensityBlack = matrix[self.blacky2_1][self.blackx2] + matrix[self.blacky1_1 - 1][self.blackx1]
+        intensityBlack -= matrix[self.blacky1_1 - 1][self.blackx2] + matrix[self.blacky2_1][self.blackx1 - 1]
+        intensityBlack += matrix[self.blacky2_2][self.blackx2] + matrix[self.blacky1_2 - 1][self.blackx1]
+        intensityBlack -= matrix[self.blacky1_2 - 1][self.blackx2] + matrix[self.blacky2_2][self.blackx1 - 1]
 
-        intensityWhite = matrix[self.whitex2][self.whitey2_3] + matrix[self.whitex1][self.whitey1_3 - 1]
-        intensityWhite -= matrix[self.whitex2][self.whitey1_3 - 1] + matrix[self.whitex1 - 1][self.whitey2_3]
-        intensityWhite += matrix[self.whitex2][self.whitey2_2] + matrix[self.whitex1][self.whitey1_2 - 1]
-        intensityWhite -= matrix[self.whitex2][self.whitey1_2 - 1] + matrix[self.whitex1 - 1][self.whitey2_2]
-        intensityWhite += matrix[self.whitex2][self.whitey2_1] + matrix[self.whitex1][self.whitey1_1 - 1]
-        intensityWhite -= matrix[self.whitex2][self.whitey1_1 - 1] + matrix[self.whitex1 - 1][self.whitey2_1]
+        intensityWhite = matrix[self.whitey2_3][self.whitex2] + matrix[self.whitey1_3 - 1][self.whitex1]
+        intensityWhite -= matrix[self.whitey1_3 - 1][self.whitex2] + matrix[self.whitey2_3][self.whitex1 - 1]
+        intensityWhite += matrix[self.whitey2_2][self.whitex2] + matrix[self.whitey1_2 - 1][self.whitex1]
+        intensityWhite -= matrix[self.whitey1_2 - 1][self.whitex2] + matrix[self.whitey2_2][self.whitex1 - 1]
+        intensityWhite += matrix[self.whitey2_1][self.whitex2] + matrix[self.whitey1_1 - 1][self.whitex1]
+        intensityWhite -= matrix[self.whitey1_1 - 1][self.whitex2] + matrix[self.whitey2_1][self.whitex1 - 1]
 
         self.intensity = abs(intensityWhite - intensityBlack)
         return self.intensity
@@ -406,14 +406,14 @@ class WeakFeature9(Feature):
 
 
     def getIntensityIntegMatrix(self, matrix):
-        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2]
-        
-        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
-        intensityWhite -= matrix[self.whitex2][self.whitey1 - 1] - matrix[self.whitex1 - 1][self.whitey2]
+        intensityBlack = matrix[self.blacky2][self.blackx2] + matrix[self.blackx1][self.blacky1 - 1]
+        intensityBlack -= (matrix[self.blacky2][self.blackx1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
 
-        intensityWhite += matrix[self.whitex2_2][self.whitey2] + matrix[self.whitex1_2][self.whitey1 - 1]
-        intensityWhite -= matrix[self.whitex2_2][self.whitey1 - 1] - matrix[self.whitex1_2 - 1][self.whitey2]
+        intensityWhite = matrix[self.whitey2][self.whitex2] + matrix[self.whitex1][self.whitey1 - 1]
+        intensityWhite -= (matrix[self.whitey2][self.whitex1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
+
+        intensityWhite += matrix[self.whitey2][self.whitex2_2] + matrix[self.whitey1][self.whitex1_2 - 1]
+        intensityWhite -= (matrix[self.whitey1][self.whitex1_2 - 1] + matrix[self.whitey2 - 1][self.whitex2_2])
 
         self.intensity = abs(intensityWhite - intensityBlack)
         return self.intensity
@@ -449,11 +449,12 @@ class WeakFeature10(Feature):
 
 
     def getIntensityIntegMatrix(self, matrix):
-        intensityBlack = matrix[self.blackx2][self.blacky2] + matrix[self.blackx1][self.blacky1 - 1]
-        intensityBlack -= (matrix[self.blackx2][self.blacky1 - 1] + matrix[self.blackx1 - 1][self.blacky2])
 
-        intensityWhite = matrix[self.whitex2][self.whitey2] + matrix[self.whitex1][self.whitey1 - 1]
-        intensityWhite -= (matrix[self.whitex2][self.whitey1 - 1] + matrix[self.whitex1 - 1][self.whitey2])
+        intensityBlack = matrix[self.blacky2][self.blackx2] + matrix[self.blacky1][self.blackx1 - 1]
+        intensityBlack -= (matrix[self.blacky2][self.blackx1 - 1] + matrix[self.blacky1 - 1][self.blackx2])
+
+        intensityWhite = matrix[self.whitey2][self.whitex2] + matrix[self.whitey1][self.whitex1 - 1]
+        intensityWhite -= (matrix[self.whitey2][self.whitex1 - 1] + matrix[self.whitey1 - 1][self.whitex2])
 
         self.intensity = abs(intensityWhite - intensityBlack)
         return self.intensity
