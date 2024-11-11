@@ -1,5 +1,3 @@
-from sympy.stats.sampling.sample_numpy import numpy
-
 from cascade import getNode
 from imageMaking import creatingIntegForm
 from readyFeatureNode import readyFeatureNode
@@ -91,7 +89,7 @@ def moving(info, matr):
 
         while (x + startSizeW * coef <= maxSizeW):
             while(y + startSizeH * coef <= maxSizeH):
-                if checkWindow(matr, x, y, info, 0):
+                if checkWindow(matr, x, y, x + startSizeW * coef, y + startSizeH * coef,  info, 0):
                     rectList.append((x, y, x + int(startSizeW * coef), y + int(startSizeW * coef)))
                 y += startSizeH * coef
 
@@ -119,7 +117,6 @@ def detect(imageName):
     maxSizeW = img.shape[1]
 
     img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    img = cv.resize(img, (200, 200))
 
     maxSizeH = img.shape[0]
     maxSizeW = img.shape[1]

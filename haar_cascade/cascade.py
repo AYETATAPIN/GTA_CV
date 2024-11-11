@@ -96,11 +96,14 @@ def getTrueInfo():
     info = next(images)
     while not (info is None):
         print(f'[{cntImages}] - {info[1]} - learn')
-        cntImages += 1
         bb = info[2]
         image = info[0]
         image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 
+        if (cntImages == 20):
+            info = next(images)
+            break
+        cntImages += 1
         infoNode = getImageInfo(image, bb)
         infoTempArray.append(infoNode)
 
