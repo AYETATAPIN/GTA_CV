@@ -146,6 +146,8 @@ def getAverageInfo(array: list[TrainImageInfo], size):
     readyInfoList: list[readyFeatureNode] = []
 
     for i in range(listFeatSize):
+        mini = 10000000
+        maxi = 0
         aver = 0
         maxType = 0
         x: float = array[0].FeaturesArray[i].x
@@ -173,14 +175,19 @@ def getAverageInfo(array: list[TrainImageInfo], size):
         for j in range(size):
 
             intensity = array[j].FeaturesArray[i].intensity
+            maxi = max(maxi, intensity)
+            mini = min(mini, intensity)
             aver += intensity
 
 
         aver = aver//size
 
-
-        newNode = readyFeatureNode(array[0].FeaturesArray[i].type, x, y, aver)
+        if (maxi - mini <= 10000):
+            newNode = readyFeatureNode(array[0].FeaturesArray[i].type, x, y, aver, isExclusive=True)
+        else:
+            newNode = readyFeatureNode(array[0].FeaturesArray[i].type, x, y, aver, isExclusive=False)
         readyInfoList.append(newNode)
+
 
     return readyInfoList
 

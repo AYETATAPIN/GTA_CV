@@ -61,8 +61,8 @@ def checkWindow(matr, x1, y1, x2, y2,  info: list[list[readyFeatureNode]], listN
         if (y <= maxSizeH
             and x <= maxSizeW):
             curFeat = getNode(node.type.value, matr, x, y, node.x, node.y)
-            if (curFeat.intensity > node.average * 1.5
-                or curFeat.intensity < node.average * 0.5):
+            if (curFeat.intensity > node.average * 1.4
+                or curFeat.intensity < node.average * 0.6):
                 cntMistakes+= 1
 
     if int(len(info[listNum]) * percentsOfMistakesForClassifiers[listNum]) < cntMistakes:
@@ -101,7 +101,7 @@ def moving(info, matr):
 
 def makeRects(image, rectList: list[(int, int, int, int)]):
     for i in rectList:
-        image = cv.rectangle(image, (i[0], i[1]), (i[2], i[3]), thickness=2)
+        image = cv.rectangle(image, (i[0], i[1]), (i[2], i[3]), thickness=2, color=(0, 255, 0))
 
     return image
 
@@ -125,9 +125,8 @@ def detect(imageName):
 
     infoModel = readInfo("model")
     info = moving(infoModel, matr)
-    append(recList, info)
 
-    image = makeRects(img, recList)
+    image = makeRects(img, info)
     cv.imshow("windowName", image)
     cv.waitKey()
 
