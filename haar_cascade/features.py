@@ -1,3 +1,5 @@
+from Cython.Tempita.compat3 import coerce_text
+
 from featureNode import FeatureType
 
 cntTypesFeatures = 10
@@ -6,6 +8,8 @@ class Feature:
     type: FeatureType
 
 class WeakFeature1(Feature):
+    coefx: float
+    coefy: float
     whitex1: int
     whitex2: int
     whitey1: int
@@ -17,7 +21,9 @@ class WeakFeature1(Feature):
 
     intensity = 0
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, coefx, coefy):
+        self.coefx = coefx
+        self.coefy = coefy
         self.blackx1 = x - 10
         self.blackx2 = x + 9
         self.blacky1 = y
@@ -43,6 +49,8 @@ class WeakFeature1(Feature):
 
 
 class WeakFeature2(Feature):
+    coefx: float
+    coefy: float
     whitex1: int
     whitex2: int
     whitey1: int
@@ -54,7 +62,9 @@ class WeakFeature2(Feature):
 
     intensity = 0
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, coefx, coefy):
+        self.coefx = coefx
+        self.coefy = coefy
         self.blackx1 = x
         self.blackx2 = x + 4
         self.blacky1 = y - 10
@@ -80,6 +90,8 @@ class WeakFeature2(Feature):
 # “рехполосный горизонтальный признак ’аара
 # Ётот признак состоит из трех горизонтальных полос: верхн€€ бела€, средн€€ черна€ и нижн€€ бела€.
 class WeakFeature3(Feature):
+    coefx: float
+    coefy: float
     whitex1: int
     whitex2: int
     whitey1: int
@@ -90,7 +102,9 @@ class WeakFeature3(Feature):
     blacky2: int
     intensity = 0
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, coefx, coefy):
+        self.coefx = coefx
+        self.coefy = coefy
         self.whitex1 = x - 10
         self.whitex2 = x + 9
         self.whitey1 = y - 5
@@ -117,6 +131,8 @@ class WeakFeature3(Feature):
 # “рехполосный вертикальный признак ’аара
 # Ётот признак состоит из трех вертикальных полос: средн€€ черна€, две боковые белые.
 class WeakFeature4(Feature):
+    coefx: float
+    coefy: float
     whitex1: int
     whitex2: int
     whitey1: int
@@ -127,7 +143,9 @@ class WeakFeature4(Feature):
     blacky2: int
     intensity = 0
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, coefx, coefy):
+        self.coefx = coefx
+        self.coefy = coefy
         self.whitex1 = x - 5
         self.whitex2 = x + 5
         self.whitey1 = y - 10
@@ -154,6 +172,8 @@ class WeakFeature4(Feature):
 # Ётот признак состоит из четырех горизонтальных полос: две белые и две черные, чередующиес€ между собой.
 
 class WeakFeature5(Feature):
+    coefx: float
+    coefy: float
     whitex1: int
     whitex2: int
     whitey1: int
@@ -166,7 +186,9 @@ class WeakFeature5(Feature):
     blacky2: int
     intensity = 0
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, coefx, coefy):
+        self.coefx = coefx
+        self.coefy = coefy
         self.whitex1 = x - 10
         self.whitex2 = x + 9
         self.whitey1 = y - 10
@@ -197,6 +219,8 @@ class WeakFeature5(Feature):
 # „етырехполосный вертикальный признак ’аара
 # Ётот признак состоит из четырех вертикальных полос: две белые и две черные, чередующиес€ между собой.
 class WeakFeature6(Feature):
+    coefx: float
+    coefy: float
     whitex1: int
     whitex2: int
     whitey1: int
@@ -209,7 +233,9 @@ class WeakFeature6(Feature):
     blacky2: int
     intensity = 0
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, coefx, coefy):
+        self.coefx = coefx
+        self.coefy = coefy
         self.whitex1 = x - 10
         self.whitex2 = x - 6
         self.whitey1 = y - 10
@@ -239,6 +265,8 @@ class WeakFeature6(Feature):
 # „етырехугольный признак ’аара
 # Ётот признак состоит из четырех квадратов.
 class WeakFeature7(Feature):
+    coefx: float
+    coefy: float
     whitex1: int
     whitex2: int
     whitey1: int
@@ -253,7 +281,9 @@ class WeakFeature7(Feature):
     blacky2: int
     intensity = 0
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, coefx, coefy):
+        self.coefx = coefx
+        self.coefy = coefy
         self.whitex1 = x - 5
         self.whitex2 = x - 1
         self.whitey1 = y - 5
@@ -286,6 +316,8 @@ class WeakFeature7(Feature):
 # Ётот признак состоит из п€ти горизонтальных полос: три белые полосы чередуютс€ с двум€ черными полосами.
 
 class WeakFeature8(Feature):
+    coefx: float
+    coefy: float
     whitex1: int
     whitex2: int
     whitey1_1: int
@@ -302,7 +334,9 @@ class WeakFeature8(Feature):
     blacky2_2: int
     intensity = 0
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, coefx, coefy):
+        self.coefx = coefx
+        self.coefy = coefy
         self.whitex1 = x - 10
         self.whitex2 = x + 9
         self.whitey1_1 = y - 10
@@ -341,6 +375,8 @@ class WeakFeature8(Feature):
 # ѕ€типолосный вертикальный признак ’аара
 # Ётот признак состоит из п€ти вертикальных полос: две крайние белые, одна черна€ в центре и две черные между ними
 class WeakFeature9(Feature):
+    coefx: float
+    coefy: float
     whitex1: int
     whitex2: int
     whitey1: int
@@ -353,7 +389,9 @@ class WeakFeature9(Feature):
     blacky2: int
     intensity = 0
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, coefx, coefy):
+        self.coefx = coefx
+        self.coefy = coefy
         self.whitex1 = x - 6
         self.whitex2 = x - 3
         self.whitey1 = y - 5
@@ -384,6 +422,8 @@ class WeakFeature9(Feature):
 # Ўирокополстный горизонтальный признак ’аара
 # Ётот признак состоит из одной широкой белой полосы слева и черной полосы справа.
 class WeakFeature10(Feature):
+    coefx: float
+    coefy: float
     whitex1: int
     whitex2: int
     whitey1: int
@@ -394,7 +434,9 @@ class WeakFeature10(Feature):
     blacky2: int
     intensity = 0
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, coefx, coefy):
+        self.coefx = coefx
+        self.coefy = coefy
         self.whitex1 = x - 10
         self.whitex2 = x + 4
         self.whitey1 = y - 10

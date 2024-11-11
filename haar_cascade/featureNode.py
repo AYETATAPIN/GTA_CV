@@ -16,8 +16,8 @@ class FeatureType(Enum):
 
 class FeatureNode:
     type : FeatureType
-    x : int
-    y : int
+    x : float
+    y : float
     intensity = 0
 
     def __init__(self, x, y, type, intensity):

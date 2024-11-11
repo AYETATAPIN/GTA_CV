@@ -6,94 +6,113 @@ from featureNode import FeatureNode
 from features import *
 from imageMaking import *
 from readyFeatureNode import readyFeatureNode
+from train_data_parser import *
+
 
 listFeatSize = 0
 
-sizeW = 200
-sizeH = 200
+dictOfFeats = {}
 
-step = 5
+boundingBoxX1 = 0
+boundingBoxX2 = 0
+boundingBoxY1 = 0
+boundingBoxY2 = 0
 
-def getNode(type, matr, x, y):
+step = 0.1
+
+def getNode(type, matr, x, y, coefx, coefy):
 
     match type:
         case 1:
-            node = FeatureNode(x, y, type, WeakFeature1(x, y).getIntenceIntegMatrix(matr))
+            node = FeatureNode(coefx, coefy, type, WeakFeature1(x, y, coefx, coefy).getIntenceIntegMatrix(matr))
             return node
         case 2:
-            node = FeatureNode(x, y, type, WeakFeature2(x, y).getIntensityIntegMatrix(matr))
+            node = FeatureNode(coefx, coefy, type, WeakFeature2(x, y, coefx, coefy).getIntensityIntegMatrix(matr))
             return node
         case 3:
-            node = FeatureNode(x, y, type, WeakFeature3(x, y).getIntensityIntegMatrix(matr))
+            node = FeatureNode(coefx, coefy, type, WeakFeature3(x, y, coefx, coefy).getIntensityIntegMatrix(matr))
             return node
         case 4:
-            node = FeatureNode(x, y, type, WeakFeature4(x, y).getIntensityIntegMatrix(matr))
+            node = FeatureNode(coefx, coefy, type, WeakFeature4(x, y, coefx, coefy).getIntensityIntegMatrix(matr))
             return node
         case 5:
-            node = FeatureNode(x, y, type, WeakFeature5(x, y).getIntensityIntegMatrix(matr))
+            node = FeatureNode(coefx, coefy, type, WeakFeature5(x, y, coefx, coefy).getIntensityIntegMatrix(matr))
             return node
         case 6:
-            node = FeatureNode(x, y, type, WeakFeature6(x, y).getIntensityIntegMatrix(matr))
+            node = FeatureNode(coefx, coefy, type, WeakFeature6(x, y, coefx, coefy).getIntensityIntegMatrix(matr))
             return node
         case 7:
-            node = FeatureNode(x, y, type, WeakFeature7(x, y).getIntensityIntegMatrix(matr))
+            node = FeatureNode(coefx, coefy, type, WeakFeature7(x, y, coefx, coefy).getIntensityIntegMatrix(matr))
             return node
         case 8:
-            node = FeatureNode(x, y, type, WeakFeature8(x, y).getIntensityIntegMatrix(matr))
+            node = FeatureNode(coefx, coefy, type, WeakFeature8(x, y, coefx, coefy).getIntensityIntegMatrix(matr))
             return node
         case 9:
-            node = FeatureNode(x, y, type, WeakFeature9(x, y).getIntensityIntegMatrix(matr))
+            node = FeatureNode(coefx, coefy, type, WeakFeature9(x, y, coefx, coefy).getIntensityIntegMatrix(matr))
             return node
         case 10:
-            node = FeatureNode(x, y, type, WeakFeature10(x, y).getIntensityIntegMatrix(matr))
+            node = FeatureNode(coefx, coefy, type, WeakFeature10(x, y, coefx, coefy).getIntensityIntegMatrix(matr))
             return node
 
-def getFeaturesInPoint(matr, x, y):
+def getFeaturesInPoint(matr, x, y, coefx, coefy):
     listOfFeat: list[FeatureNode] = []
     global listFeatSize
     listFeatSize += cntTypesFeatures
     for type in range(1, cntTypesFeatures + 1):
-        node = getNode(type, matr, x, y)
+        node = getNode(type, matr, x, y, coefx, coefy)
         listOfFeat.append(node)
     return listOfFeat
 
-def getImageInfo(img):
+def getImageInfo(img, bb):
     global listFeatSize
     listFeatSize = 0
     imageInfo = TrainImageInfo()
+    x1 = bb[0]
+    y1 = bb[1]
+    x2 = bb[2]
+    y2 = bb[3]
 
 
+    matr = creatingIntegForm(img, img.shape[0], img.shape[1])
 
-    matr = creatingIntegForm(img, sizeH, sizeW)
 
-    for y in range(20, sizeW - 19, step):
-        for x in range(20, sizeH - 19, step):
-            imageInfo.addNodes(getFeaturesInPoint(matr, x, y))
-
+    for y in range(1, 10, 1):
+        for x in range(1, 10, 1):
+            xToFeat = int(x1 + (x2 - x1) /10 * step * x)
+            yToFeat = int(y1 + (y2 - y1) / 10 * step * y)
+            imageInfo.addNodes(getFeaturesInPoint(matr, xToFeat, yToFeat, x * step, y * step))
     return imageInfo
 
 
-def getTrueInfo(trueDic):
+def getTrueInfo():
+
     infoArray = []
-    infoWeakArray = []
-    oldDir = os.getcwd()
-    os.chdir(trueDic)
-    cntImg = sum([len(files) for r, d, files in os.walk(os.getcwd())])
-    infoArray.append(cntImg)
+    infoTempArray = []
+    cntImages = 0
     global listFeatSize
 
-    for i in range(1, cntImg + 1):
-        fileName = "car" + str(i) + ".jpg"
-        print(f"carNumber = {i}\n")
-        infoNode = getImageInfo(createImg(fileName, sizeW, sizeH))
-        infoWeakArray.append(infoNode)
+    images = parse_data(DATASET_DIR)
 
-    infoArray.append(infoWeakArray)
+    info = next(images)
+    while not (info is None):
+        print(f'[{cntImages}] - {info[1]} - learn')
+        cntImages += 1
+        bb = info[2]
+        image = info[0]
+        image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 
-    os.chdir(oldDir)
+        infoNode = getImageInfo(image, bb)
+        infoTempArray.append(infoNode)
+
+        info = next(images)
+        info = None
+
+    infoArray.append(cntImages)
+    infoArray.append(infoTempArray)
+
     return infoArray
 
-
+"""
 def getFalseInfo(falseDic):
     infoArray = []
     infoWeakArray = []
@@ -118,16 +137,18 @@ def getFalseInfo(falseDic):
     os.chdir(oldDir)
     return infoArray
 
+"""
+
 
 def getAverageInfo(array: list[TrainImageInfo], size):
     readyInfoList: list[readyFeatureNode] = []
 
     for i in range(listFeatSize):
         aver = 0
-        maxCnt = 0
         maxType = 0
-        x: int = 0
-        y: int = 0
+        x: float = array[0].FeaturesArray[i].x
+        y: float = array[0].FeaturesArray[i].y
+        """
         type: FeatureType
         dictTypes: dict[FeatureType, int] = {}
         for j in range(size):
@@ -145,44 +166,38 @@ def getAverageInfo(array: list[TrainImageInfo], size):
                 if maxCnt == 0:
                     maxCnt = 1
                     maxType = type
+        """
 
         for j in range(size):
-            type = array[j].FeaturesArray[i].type
-            if type == maxType:
-                intensity = array[j].FeaturesArray[i].intensity
-                aver += intensity * intensity
 
-        if maxCnt != 0 :
-            aver/=maxCnt
-            aver = int(math.sqrt(aver))
-        else:
-            aver = 0
+            intensity = array[j].FeaturesArray[i].intensity
+            aver += intensity
 
-        newNode = readyFeatureNode(maxType, x, y, aver)
+
+        aver = aver//size
+
+
+        newNode = readyFeatureNode(array[0].FeaturesArray[i].type, x, y, aver)
         readyInfoList.append(newNode)
 
     return readyInfoList
 
 
-def analyseInfo(trueDic):
-    trueInfoArray = getTrueInfo(trueDic)
+def analyseInfo():
+    trueInfoArray = getTrueInfo()
     trueReadyInfo = getAverageInfo(trueInfoArray[1], trueInfoArray[0])
-
-    if sizeW == 300:
-        falseInfoFileName = "wrongInfo300.txt"
-    else:
-        falseInfoFileName = "wrongInfo200.txt"
-
+    return trueReadyInfo
+"""
     falseReadyInfo = readWrongInfo(falseInfoFileName)
-    weakPercent = 0.1
+    weakPercent = 0.3
 
     for i in range(listFeatSize):
-        if trueReadyInfo[i].type == falseReadyInfo[i].type:
-            if (trueReadyInfo[i].average*(1 + weakPercent) >= falseReadyInfo[i].average
-                    >= trueReadyInfo[i].average*(1 - weakPercent)):
-                trueReadyInfo[i].setExclusiveness(False)
+        if (trueReadyInfo[i].average*(1 + weakPercent) >= falseReadyInfo[i].average
+                >= trueReadyInfo[i].average*(1 - weakPercent)):
+            trueReadyInfo[i].setExclusiveness(False)"""
 
-    return trueReadyInfo
+
+
 
 
 def writeInfo(array: list[readyFeatureNode], fileToWrite):
@@ -194,6 +209,7 @@ def writeInfo(array: list[readyFeatureNode], fileToWrite):
     file.close()
 
 
+"""
 def readWrongInfo(filename):
      size: int
      infoArray: list[readyFeatureNode] = []
@@ -217,7 +233,7 @@ def readWrongInfo(filename):
 
          infoArray.append(readyFeatureNode(type, x, y, intency))
 
-     return infoArray, size
+     return infoArray
 
 def makeWrongInfo(falseDic, sizeWidth, sizeHeight, fileWithWrongInfo):
     global sizeW
@@ -227,14 +243,14 @@ def makeWrongInfo(falseDic, sizeWidth, sizeHeight, fileWithWrongInfo):
     falseInfoArray = getFalseInfo(falseDic)
     falseReadyInfo = getAverageInfo(falseInfoArray[1], falseInfoArray[0])
     writeInfo(falseReadyInfo, fileWithWrongInfo)
+"""
 
-def learn(trueDic, fileToWrite, sizeWidth, sizeHeight):
-    global sizeW
-    global sizeH
-    sizeW = sizeWidth
-    sizeH = sizeHeight
-    array = analyseInfo(trueDic)
+def learn(fileToWrite):
+    print("Start learning\n")
+    array = analyseInfo()
+    print("Start writing\n")
     writeInfo(array, fileToWrite)
+
 
 
 

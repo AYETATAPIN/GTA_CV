@@ -15,7 +15,7 @@ class DatasetImage:
 
     def __next__(self):
         if self.index >= len(self.data):
-            raise StopIteration
+            raise None
         value = self.data[self.index]
         self.index += 1
         image_path = f"{self.dataset_dir}/cars_train/cars_train/{value['image'][0]}"

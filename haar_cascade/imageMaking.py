@@ -4,7 +4,6 @@ import cv2 as cv
 def createImg(fileName, sizeW, sizeH):
     img = cv.imread(fileName)
     img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    img = cv.resize(img, (sizeW, sizeH), interpolation=cv.INTER_AREA)
     return img
 
 def creatingIntegForm(image, size1, size2):

@@ -2,8 +2,8 @@ from featureNode import FeatureType
 
 class readyFeatureNode:
     average = 0
-    x: int
-    y: int
+    x: float
+    y: float
     type : FeatureType
     isExclusive = True
 

@@ -1,9 +1,11 @@
-from cascade import learn, makeWrongInfo
+from cascade import learn
+from detector import detect
 
 
 def main():
-    makeWrongInfo("falseCars", 300, 200, "wrongInfo300")
-    print("learn compl")
+    learn("model")
+
 
 if __name__ == "__main__":
     main()
+
