@@ -113,4 +113,3 @@ def detect(imageName):
 
     image = makeRects(img, info)
     cv.imshow("windowName", image)
-    cv.waitKey()
