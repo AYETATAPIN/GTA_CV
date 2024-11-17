@@ -5,17 +5,12 @@ from featureNode import *
 import cv2 as cv
 from numpy import append
 
-
 percentsOfMistakesForClassifiers: list[float] = [0.5, 0.5, 0.5, 0.5, 0.5]
-
-maxSizeW = 0
-maxSizeH = 0
-
 startSizeW = 200
 startSizeH = 200
 coef = 1.0
 step = 20
-
+aspect_ratios = [(1, 1), (2, 1), (1, 2)]
 
 def readInfo(filename):
      size: int
@@ -49,7 +44,7 @@ def readInfo(filename):
      return infoArray
 
 def checkWindow(matr, x1, y1, x2, y2,  info: list[list[readyFeatureNode]], listNum):
-    if (listNum > 4):
+    if listNum > 4:
         return True
 
     global coef
@@ -71,33 +66,22 @@ def checkWindow(matr, x1, y1, x2, y2,  info: list[list[readyFeatureNode]], listN
     return True
 
 def moving(info, matr):
-    global coef
-    coef = 1
+    global step
+    global aspect_ratios
     global startSizeH
     global startSizeW
-    global step
-    global maxSizeW
-    global maxSizeH
-    rectList: list[(int, int, int, int)] = []
-    x: int = 0
-    y: int = 0
+    maxH, maxW = matr.shape
+    rectList = []
+    coef = 1.0
 
-    while (startSizeW * coef  <= maxSizeW
-          and startSizeH * coef <= maxSizeH):
-        x = 0
-        y = 0
-
-        while (x + startSizeW * coef <= maxSizeW):
-            y = 0
-            while(y + startSizeH * coef <= maxSizeH):
-                if checkWindow(matr, x, y, x + startSizeW * coef, y + startSizeH * coef,  info, 0):
-                    rectList.append((x, y, x + int(startSizeW * coef), y + int(startSizeW * coef)))
-                y += step
-            x += step
-
-
+    while startSizeW * coef <= maxW and startSizeH * coef <= maxH:
+        for ar_w, ar_h in aspect_ratios:
+            curW, curH = int(startSizeW * coef * ar_w), int(startSizeH * coef * ar_h)
+            for x in range(0, maxW - curW + 1, step):
+                for y in range(0, maxH - curH + 1, step):
+                    if checkWindow(matr, x, y, x + curW, y + curH, info, 0):
+                        rectList.append((x, y, x + curW, y + curH))
         coef += 0.1
-
     return rectList
 
 def makeRects(image, rectList: list[(int, int, int, int)]):
@@ -130,4 +114,3 @@ def detect(imageName):
     image = makeRects(img, info)
     cv.imshow("windowName", image)
     cv.waitKey()
-
