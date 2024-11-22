@@ -77,7 +77,7 @@ def data_refactoring(dataset_path):
         with Image.open(source_image) as img:
             width, height = img.size
             if width <= 0 or height <= 0:
-                raise ValueError(f"Недопустимые размеры изображения: {width}x{height}")
+                raise ValueError(f"Invalid image size: {width}x{height}")
             if not (0 <= source_coordinates[0] < source_coordinates[2] <= width and
                     0 <= source_coordinates[1] < source_coordinates[3] <= height):
                 raise ValueError(f"Invalid bbox coordinates: {source_coordinates}")
