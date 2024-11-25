@@ -1,78 +1,79 @@
-from cascade import getNode
+from cascade import getNode, isObj
 from imageMaking import creatingIntegForm
-from readyFeatureNode import readyFeatureNode
+from readyFeatureNode import readyFeatureNode, Classifier
 from featureNode import *
 import cv2 as cv
-from numpy import append
+from numpy import sign
 
 
-percentsOfMistakesForClassifiers: list[float] = [0.5, 0.5, 0.5, 0.5, 0.5]
+
+percentsOfMistakesForClassifiers: list[float] = [0.5, 0.1, 0.1, 0.1, 0.05]
 
 maxSizeW = 0
 maxSizeH = 0
 
 startSizeW = 200
 startSizeH = 200
-coef = 1.0
+coefx = 1.0
+coefy = 1.0
 step = 20
 
 
 def readInfo(filename):
      size: int
-     infoArray: list[list[readyFeatureNode]] = []
-     infoArray.append([])
-     infoArray.append([])
-     infoArray.append([])
-     infoArray.append([])
-     infoArray.append([])
-     infoArray.append([])
      file = open(filename, mode="r")
      lines = file.readlines()
-     size = len(lines) // 5
-     for i in range(size):
+     size = 0
+     classifs: list[Classifier] = []
+     i = 0
+     while i < len(lines):
+        st = lines[i].split(";")
+        classifs.append(Classifier())
+        classifs[size].weight = float(st[0])
+        classifs[size].size = int(st[1])
+        i += 2
 
-         st = lines[i*5].split(" ")
-         x = float(st[0])
+        for j in range(classifs[size].size):
+            st = lines[i].split(" ")
+            x = float(st[0])
+            i += 1
 
-         st = lines[i * 5 + 1].split(" ")
-         y = float(st[0])
+            st = lines[i].split(" ")
+            y = float(st[0])
+            i += 1
 
-         st = lines[i * 5 + 2].split(" ")
-         typeInt = int(st[0])
-         type = FeatureType(int(st[0]))
+            st = lines[i].split(" ")
+            typeInt = int(st[0])
+            type = FeatureType(int(st[0]))
+            i += 1
 
-         st = lines[i * 5 + 3].split(" ")
-         intency = int(st[0])
+            st = lines[i].split(" ")
+            intency = int(st[0])
+            i += 2
 
-         infoArray[int((typeInt)/2)].append(readyFeatureNode(type, x, y, intency))
+            classifs[size].addNode(readyFeatureNode(type, x, y, intency))
 
-     return infoArray
+        size += 1
 
-def checkWindow(matr, x1, y1, x2, y2,  info: list[list[readyFeatureNode]], listNum):
-    if (listNum > 4):
+     return classifs
+
+
+def checkWindow(matr, x1, y1, x2, y2, classifs:list[Classifier]):
+
+    summary = 0
+    for cl in classifs:
+        summary += isObj(cl, matr, (x1, y1, x2, y2)) * cl.weight
+
+    if summary >= 0:
         return True
-
-    global coef
-    cntMistakes: int = 0
-
-    for node in info[listNum]:
-        y = y1 + int(node.y * (y2-y1))
-        x = x1 + int(node.x * (x2-x1))
-        if (y + 20 <= maxSizeH
-            and x + 20 <= maxSizeW):
-            curFeat = getNode(node.type.value, matr, x, y, node.x, node.y)
-            if (curFeat.intensity > node.average * 1.4
-                or curFeat.intensity < node.average * 0.6):
-                cntMistakes+= 1
-
-    if int(len(info[listNum]) * percentsOfMistakesForClassifiers[listNum]) < cntMistakes:
+    else:
         return False
 
-    return True
-
-def moving(info, matr):
-    global coef
-    coef = 1
+def moving(classifis, matr):
+    global coefx
+    global coefy
+    coefx = 1
+    coefy = 1
     global startSizeH
     global startSizeW
     global step
@@ -82,21 +83,23 @@ def moving(info, matr):
     x: int = 0
     y: int = 0
 
-    while (startSizeW * coef  <= maxSizeW
-          and startSizeH * coef <= maxSizeH):
-        x = 0
-        y = 0
-
-        while (x + startSizeW * coef <= maxSizeW):
+    while startSizeW * coefx  <= maxSizeW:
+        coefy = 1
+        while startSizeH * coefy <= maxSizeH:
+            x = 0
             y = 0
-            while(y + startSizeH * coef <= maxSizeH):
-                if checkWindow(matr, x, y, x + startSizeW * coef, y + startSizeH * coef,  info, 0):
-                    rectList.append((x, y, x + int(startSizeW * coef), y + int(startSizeW * coef)))
-                y += step
-            x += step
 
+            while (x + startSizeW * coefx <= maxSizeW):
+                y = 0
+                while(y + startSizeH * coefy <= maxSizeH):
+                    if checkWindow(matr, x, y, x + startSizeW * coefx, y + startSizeH * coefy, classifis):
+                        rectList.append((x, y, x + int(startSizeW * coefx), y + int(startSizeH * coefy)))
+                    y += step
+                x += step
 
-        coef += 0.1
+            coefy += 0.2
+
+        coefx += 0.2
 
     return rectList
 

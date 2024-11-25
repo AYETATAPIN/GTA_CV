@@ -1,3 +1,5 @@
+from sympy import false
+
 from featureNode import FeatureType
 
 class readyFeatureNode:
@@ -16,3 +18,16 @@ class readyFeatureNode:
 
     def setExclusiveness(self, isExclusive):
         self.isExclusive = isExclusive
+
+
+class Classifier:
+    nodes: list[readyFeatureNode]
+    size = 0
+    weight: float = 0
+
+    def __init__(self):
+        self.nodes = []
+
+    def addNode(self, node: readyFeatureNode):
+        self.nodes.append(node)
+        self.size += 1

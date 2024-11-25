@@ -2,8 +2,8 @@ from cascade import learn
 from detector import detect
 
 
-def main():
-    detect("dataset/cars_train/cars_train/00001.jpg")
+def main(): 
+    learn("model")
 
 
 if __name__ == "__main__":

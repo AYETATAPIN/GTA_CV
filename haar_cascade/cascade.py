@@ -1,15 +1,25 @@
 import math
-import os
+
 
 from TrainImageInfo import *
 from featureNode import FeatureNode
 from features import *
 from imageMaking import *
-from readyFeatureNode import readyFeatureNode
+from readyFeatureNode import readyFeatureNode, Classifier
 from train_data_parser import *
 
+cntForFstLearn = 1
+cntTrueImagesMax = 2
+cntFalseImagesLearn = 1
+cntFalseImagesSupL = 2
+
+
+images = parse_data(DATASET_DIR)
 
 listFeatSize = 0
+curFalseImg = 0
+
+
 
 dictOfFeats = {}
 
@@ -84,14 +94,14 @@ def getImageInfo(img, bb):
     return imageInfo
 
 
-def getTrueInfo():
 
+
+def getTrueInfo():
     infoArray = []
     infoTempArray = []
     cntImages = 0
     global listFeatSize
-
-    images = parse_data(DATASET_DIR)
+    global cntForFstLearn
 
     info = next(images)
     while not (info is None):
@@ -100,50 +110,56 @@ def getTrueInfo():
         image = info[0]
         image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 
-        if (cntImages == 20):
-            info = next(images)
-            break
         cntImages += 1
         infoNode = getImageInfo(image, bb)
         infoTempArray.append(infoNode)
 
         info = next(images)
+        if (cntImages == cntForFstLearn):
+            break
+
 
     infoArray.append(cntImages)
     infoArray.append(infoTempArray)
 
     return infoArray
 
-"""
-def getFalseInfo(falseDic):
+
+def getNextFalse():
+    global curFalseImg
+    name = "noCars/" + str(curFalseImg) + ".jpg"
+    img = cv.imread(name)
+    if img is None:
+        return None
+    img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    curFalseImg += 1
+    return img
+
+def getFalseInfo():
     infoArray = []
-    infoWeakArray = []
-    oldDir = os.getcwd()
-    os.chdir(falseDic)
-    cntImg = sum([len(files) for r, d, files in os.walk(os.getcwd())])
-    infoArray.append(cntImg)
+    infoTempArray: list[TrainImageInfo] = []
+    cntImages = 0
+    img = getNextFalse()
+    while img is not None:
+        bb = (0, 0, img.shape[0], img.shape[1])
 
-    for i in range(0, cntImg):
-        fileName = "wrongPic" + str(i) + ".jpg"
-        print(f"falseNum = {i}")
-        image = createImg(fileName, sizeW, sizeH)
+        cntImages += 1
+        infoNode = getImageInfo(img, bb)
+        infoTempArray.append(infoNode)
 
-        if image is None:
-            print(f"No file {fileName}\n")
-            exit(1)
+        if cntImages == cntFalseImagesLearn:
+            break
+        else:
+            img = getNextFalse()
 
-        infoNode = getImageInfo(image)
-        infoWeakArray.append(infoNode)
-    infoArray.append(infoWeakArray)
-
-    os.chdir(oldDir)
+    infoArray.append(cntImages)
+    infoArray.append(infoTempArray)
     return infoArray
-
-"""
 
 
 def getAverageInfo(array: list[TrainImageInfo], size):
     readyInfoList: list[readyFeatureNode] = []
+    global listFeatSize
 
     for i in range(listFeatSize):
         mini = 10000000
@@ -152,25 +168,6 @@ def getAverageInfo(array: list[TrainImageInfo], size):
         maxType = 0
         x: float = array[0].FeaturesArray[i].x
         y: float = array[0].FeaturesArray[i].y
-        """
-        type: FeatureType
-        dictTypes: dict[FeatureType, int] = {}
-        for j in range(size):
-            x = array[j].FeaturesArray[i].x
-            y = array[j].FeaturesArray[i].y
-            type = array[j].FeaturesArray[i].type
-            if type in dictTypes.keys():
-                cnt = dictTypes[type]
-                dictTypes[type] = cnt + 1
-                if cnt + 1 > maxCnt:
-                    maxCnt = cnt + 1
-                    maxType = type
-            else:
-                dictTypes[type] = 1
-                if maxCnt == 0:
-                    maxCnt = 1
-                    maxType = type
-        """
 
         for j in range(size):
 
@@ -183,82 +180,189 @@ def getAverageInfo(array: list[TrainImageInfo], size):
         aver = aver//size
 
         if (maxi - mini <= 10000):
-            newNode = readyFeatureNode(array[0].FeaturesArray[i].type, x, y, aver, isExclusive=True)
-        else:
-            newNode = readyFeatureNode(array[0].FeaturesArray[i].type, x, y, aver, isExclusive=False)
-        readyInfoList.append(newNode)
+            newNode = readyFeatureNode(array[0].FeaturesArray[i].type, x, y, aver, 1/float(listFeatSize))
+            readyInfoList.append(newNode)
 
 
     return readyInfoList
 
 
+def isObj(classifier: Classifier, img, bb):
+    cntMistakes = 0
+
+    for node in classifier.nodes:
+        inten = getNode(node.type.value, img, bb[0], bb[1], node.x, node.y).intensity
+        if  not(node.average * 0.9 <= inten <= node.average * 1.1):
+            cntMistakes += 1
+
+
+    if cntMistakes <= 0.5 * classifier.size:
+        return 1
+    else:
+        return -1
+
+## Разбить фичи Хаара на классифаеры (по необходимости переписать)
+def makeClassifiers(info: list[readyFeatureNode]):
+    classifiers: list[Classifier] = []
+    for i in range(cntTypesFeatures):
+        classifiers.append(Classifier())
+
+    for node in info:
+        classifiers[node.type.value - 1].addNode(node)
+
+    return classifiers
+
+def getAns(classifs: list[Classifier], cntTrueImages, cntLearnImages):
+
+    answers: list[list[int]] = []
+    for i in range(len(classifs)):
+        answers.append([])
+        for j in range(cntLearnImages):
+            answers[i].append(0)
+
+    images = parse_data(DATASET_DIR)
+    info = next(images)
+    cntImages = 0
+    while info is not None:
+        bb = info[2]
+        image = info[0]
+        image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+        matr = creatingIntegForm(image, image.shape[0], image.shape[1])
+
+        for i in range(len(classifs)):
+            ans = isObj(classifs[i], matr, bb)
+            answers[i][cntImages] = ans
+
+        cntImages += 1
+        if cntTrueImages == cntImages:
+            break
+
+        info = next(images)
+        if images is None:
+            cntTrueImages = cntImages
+
+    global cntFalseImagesSupL
+    global curFalseImg
+    curFalseImg = 0
+    img = getNextFalse()
+    cntFalseImages = 0
+    while img is not None:
+        bb = (0, 0, img.shape[0], img.shape[1])
+        matr = creatingIntegForm(img, img.shape[0], img.shape[1])
+
+        for i in range(len(classifs)):
+            ans = isObj(classifs[i], matr, bb)
+            answers[i][cntImages] = ans
+
+        cntImages += 1
+        cntFalseImages += 1
+
+        if cntImages == cntFalseImagesSupL + cntTrueImagesMax:
+            break
+        else:
+            img = getNextFalse()
+            if img is None:
+                cntFalseImages = cntImages
+
+    return answers, cntTrueImages, cntFalseImages
+
+
+
 def analyseInfo():
+    global images
     trueInfoArray = getTrueInfo()
     trueReadyInfo = getAverageInfo(trueInfoArray[1], trueInfoArray[0])
-    return trueReadyInfo
-"""
-    falseReadyInfo = readWrongInfo(falseInfoFileName)
-    weakPercent = 0.3
+    classifs = makeClassifiers(trueReadyInfo)
 
-    for i in range(listFeatSize):
-        if (trueReadyInfo[i].average*(1 + weakPercent) >= falseReadyInfo[i].average
-                >= trueReadyInfo[i].average*(1 - weakPercent)):
-            trueReadyInfo[i].setExclusiveness(False)"""
+    global cntTrueImagesMax
+    global cntFalseImagesSupL
+    cntLearnImages = cntTrueImagesMax + cntFalseImagesSupL
+
+    answers, cntTrueImagesMax, cntFalseImagesSupL = getAns(classifs, cntTrueImagesMax, cntLearnImages)
+    cntLearnImages = cntTrueImagesMax + cntFalseImagesSupL
+
+    endClassifier: list[Classifier] = []
+    sizeEndClass = 0
+
+    weights = []
+    errors = []
+
+    classToIt = {}
+    itToClass = {}
+    for i in range(len(classifs)):
+        classToIt.update({classifs[i]: i})
+        itToClass.update({i: classifs[i]})
+        errors.append(0)
+
+    for j in range(cntLearnImages):
+        weights.append(1 / cntLearnImages)
+
+    for i in range(len(classifs)):
+
+        minError = 2
+        minErrorIt = -1
+
+        curIt = 0
+        curMinIt = -1
+        for cl in classifs:
+
+            images = parse_data(DATASET_DIR)
+            error = 0
+
+            for ans in range(cntTrueImagesMax):
+                if answers[classToIt[cl]][ans] == -1:
+                    error += weights[ans]
+
+            for ans in range(cntFalseImagesSupL):
+                if answers[classToIt[cl]][ans + cntTrueImagesMax] == 1:
+                    error += weights[ans + cntTrueImagesMax]
+
+            errors[classToIt[cl]] = error
+
+            if minError > error:
+                minError = error
+                minErrorIt = classToIt[cl]
+                curMinIt = curIt
+
+            curIt += 1
+
+        endClassifier.append(classifs.pop(curMinIt))
+        endClassifier[sizeEndClass].weight = 1/2 * math.log((1 - errors[minErrorIt])/errors[minErrorIt])
+        sizeEndClass += 1
+
+        totalW = 0
+        for j in range(cntTrueImagesMax):
+            weights[j] *= math.exp(-endClassifier[sizeEndClass-1].weight * answers[minErrorIt][j])
+            totalW += weights[j]
+
+        for j in range(cntFalseImagesSupL):
+            weights[j] *= math.exp(endClassifier[sizeEndClass-1].weight * answers[minErrorIt][j])
+            totalW += weights[j]
+
+        for j in range(cntLearnImages):
+            weights[j] /= totalW
+            totalW += weights[j]
+
+
+    return endClassifier
 
 
 
 
-
-def writeInfo(array: list[readyFeatureNode], fileToWrite):
+def writeInfo(array: list[Classifier], fileToWrite):
     file = open(fileToWrite, mode='w')
-    global listFeatSize
-    for i in range(0, listFeatSize):
-        if array[i].isExclusive:
-            file.write(f'{array[i].x}\n{array[i].y}\n{int(array[i].type.value)}\n{int(array[i].average)}\n\n')
+    for cl in array:
+        file.write(f'{cl.weight};{cl.size}\n\n')
+        for feat in cl.nodes:
+            file.write(f'{feat.x}\n{feat.y}\n{int(feat.type.value)}\n{int(feat.average)}\n\n')
     file.close()
 
 
-"""
-def readWrongInfo(filename):
-     size: int
-     infoArray: list[readyFeatureNode] = []
-     file = open(filename, mode="r")
-     lines = file.readlines()
-     size = len(lines) // 5
-     for i in range(size):
-
-         st = lines[i*5].split(" ")
-         x = int(st[0])
-
-         st = lines[i * 5 + 1].split(" ")
-         y = int(st[0])
-
-         st = lines[i * 5 + 2].split(" ")
-         typeInt = int(st[0])
-         type = FeatureType(int(st[0]))
-
-         st = lines[i * 5 + 3].split(" ")
-         intency = int(st[0])
-
-         infoArray.append(readyFeatureNode(type, x, y, intency))
-
-     return infoArray
-
-def makeWrongInfo(falseDic, sizeWidth, sizeHeight, fileWithWrongInfo):
-    global sizeW
-    global sizeH
-    sizeW = sizeWidth
-    sizeH = sizeHeight
-    falseInfoArray = getFalseInfo(falseDic)
-    falseReadyInfo = getAverageInfo(falseInfoArray[1], falseInfoArray[0])
-    writeInfo(falseReadyInfo, fileWithWrongInfo)
-"""
-
 def learn(fileToWrite):
     print("Start learning\n")
-    array = analyseInfo()
+    classifs = analyseInfo()
     print("Start writing\n")
-    writeInfo(array, fileToWrite)
+    writeInfo(classifs, fileToWrite)
 
 
 
