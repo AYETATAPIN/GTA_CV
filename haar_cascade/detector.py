@@ -70,38 +70,47 @@ def checkWindow(matr, x1, y1, x2, y2, classifs:list[Classifier]):
         return False
 
 def moving(classifis, matr):
-    global coefx
-    global coefy
-    coefx = 1
-    coefy = 1
-    global startSizeH
-    global startSizeW
-    global step
-    global maxSizeW
-    global maxSizeH
+    min_scale = 0.1  # Минимальная пропорция окна от размеров изображения
+    max_scale = 1.0  # Максимальная пропорция окна от размеров изображения
+    scale_step = 0.1  # Шаг изменения масштаба окна
+    aspect_step = 0.2  # Шаг изменения соотношения сторон
+    img_height, img_width = matr.shape
     rectList: list[(int, int, int, int)] = []
-    x: int = 0
-    y: int = 0
 
-    while startSizeW * coefx  <= maxSizeW:
-        coefy = 1
-        while startSizeH * coefy <= maxSizeH:
-            x = 0
-            y = 0
+    scale = min_scale
+    while scale <= max_scale:
+        base_width = int(img_width * scale)
+        base_height = int(img_height * scale)
+        
+        aspect_ratio = 1.0
+        while aspect_ratio >= aspect_step:
+            rect_width = int(base_width * aspect_ratio)
+            rect_height = base_height
+            scan_windows(matr, classifis, rect_width, rect_height, img_width, img_height, rectList)
+            aspect_ratio -= aspect_step
 
-            while (x + startSizeW * coefx <= maxSizeW):
-                y = 0
-                while(y + startSizeH * coefy <= maxSizeH):
-                    if checkWindow(matr, x, y, x + startSizeW * coefx, y + startSizeH * coefy, classifis):
-                        rectList.append((x, y, x + int(startSizeW * coefx), y + int(startSizeH * coefy)))
-                    y += step
-                x += step
-
-            coefy += 0.2
-
-        coefx += 0.2
+        aspect_ratio = 1.2
+        while aspect_ratio <= 5.0:
+            rect_width = base_width
+            rect_height = int(base_height / aspect_ratio)
+            scan_windows(matr, classifis, rect_width, rect_height, img_width, img_height, rectList)
+            aspect_ratio += aspect_step
+        
+        scale += scale_step
 
     return rectList
+
+def scan_windows(matr, classifis, rect_width, rect_height, img_width, img_height, rectList):
+    global step
+    
+    x = 0
+    while x + rect_width <= img_width:
+        y = 0
+        while y + rect_height <= img_height:
+            if checkWindow(matr, x, y, x + rect_width, y + rect_height, classifis):
+                rectList.append((x, y, x + rect_width, y + rect_height))
+            y += step
+        x += step
 
 def makeRects(image, rectList: list[(int, int, int, int)]):
     for i in rectList:
