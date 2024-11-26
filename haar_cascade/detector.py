@@ -89,10 +89,10 @@ def moving(classifis, matr):
             scan_windows(matr, classifis, rect_width, rect_height, img_width, img_height, rectList)
             aspect_ratio -= aspect_step
 
-        aspect_ratio = 1.2
-        while aspect_ratio <= 5.0:
+        aspect_ratio += aspect_step
+        while aspect_ratio < 1.0:
             rect_width = base_width
-            rect_height = int(base_height / aspect_ratio)
+            rect_height = int(base_height * aspect_ratio)
             scan_windows(matr, classifis, rect_width, rect_height, img_width, img_height, rectList)
             aspect_ratio += aspect_step
         
