@@ -73,7 +73,7 @@ def moving(classifis, matr):
     min_scale = 0.1  # Минимальная пропорция окна от размеров изображения
     max_scale = 1.0  # Максимальная пропорция окна от размеров изображения
     scale_step = 0.1  # Шаг изменения масштаба окна
-    aspect_step = 0.2  # Шаг изменения соотношения сторон
+    aspect_step = 0.1  # Шаг изменения соотношения сторон
     img_height, img_width = matr.shape
     rectList: list[(int, int, int, int)] = []
 
