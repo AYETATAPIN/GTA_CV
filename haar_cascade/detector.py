@@ -5,8 +5,8 @@ from featureNode import *
 import cv2 as cv
 
 percentsOfMistakesForClassifiers: list[float] = [0.5, 0.1, 0.1, 0.1, 0.05]
-startSizeW = 200
-startSizeH = 200
+startSizeW = 100
+startSizeH = 100
 scale_step = 0.1
 aspect_step = 0.1
 step = 20
