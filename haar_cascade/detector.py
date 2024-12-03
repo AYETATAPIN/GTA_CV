@@ -3,30 +3,22 @@ from imageMaking import creatingIntegForm
 from readyFeatureNode import readyFeatureNode, Classifier
 from featureNode import *
 import cv2 as cv
-from numpy import sign
-
-
 
 percentsOfMistakesForClassifiers: list[float] = [0.5, 0.1, 0.1, 0.1, 0.05]
-
-maxSizeW = 0
-maxSizeH = 0
-
-startSizeW = 200
-startSizeH = 200
-coefx = 1.0
-coefy = 1.0
+startSizeW = 100
+startSizeH = 100
+scale_step = 0.1
+aspect_step = 0.1
 step = 20
 
-
 def readInfo(filename):
-     size: int
-     file = open(filename, mode="r")
-     lines = file.readlines()
-     size = 0
-     classifs: list[Classifier] = []
-     i = 0
-     while i < len(lines):
+    size: int
+    file = open(filename, mode="r")
+    lines = file.readlines()
+    size = 0
+    classifs: list[Classifier] = []
+    i = 0
+    while i < len(lines):
         st = lines[i].split(";")
         classifs.append(Classifier())
         classifs[size].weight = float(st[0])
@@ -55,11 +47,9 @@ def readInfo(filename):
 
         size += 1
 
-     return classifs
-
+    return classifs
 
 def checkWindow(matr, x1, y1, x2, y2, classifs:list[Classifier]):
-
     summary = 0
     for cl in classifs:
         summary += isObj(cl, matr, (x1, y1, x2, y2)) * cl.weight
@@ -70,38 +60,41 @@ def checkWindow(matr, x1, y1, x2, y2, classifs:list[Classifier]):
         return False
 
 def moving(classifis, matr):
-    global coefx
-    global coefy
-    coefx = 1
-    coefy = 1
     global startSizeH
     global startSizeW
-    global step
-    global maxSizeW
-    global maxSizeH
+    global scale_step
+    global aspect_step
+    img_height, img_width = matr.shape
     rectList: list[(int, int, int, int)] = []
-    x: int = 0
-    y: int = 0
+    scales = [scale_step * i for i in range(1, int(1 / scale_step) + 1)]
+    ratios = [aspect_step * i for i in range(1, int(1 / aspect_step) + 1)]
 
-    while startSizeW * coefx  <= maxSizeW:
-        coefy = 1
-        while startSizeH * coefy <= maxSizeH:
-            x = 0
-            y = 0
+    for scale in scales:
+        base_width = int(img_width * scale)
+        base_height = int(img_height * scale)
 
-            while (x + startSizeW * coefx <= maxSizeW):
-                y = 0
-                while(y + startSizeH * coefy <= maxSizeH):
-                    if checkWindow(matr, x, y, x + startSizeW * coefx, y + startSizeH * coefy, classifis):
-                        rectList.append((x, y, x + int(startSizeW * coefx), y + int(startSizeH * coefy)))
-                    y += step
-                x += step
-
-            coefy += 0.2
-
-        coefx += 0.2
+        for aspect_ratio in ratios:
+            rect_width = int(base_width * aspect_ratio)
+            rect_height = base_height
+            if (rect_height >= startSizeH) and (rect_width >= startSizeW):
+                scan_windows(matr, classifis, rect_width, rect_height, img_width, img_height, rectList)
+                
+            if aspect_ratio != 1:
+                rect_width = base_width
+                rect_height = int(base_height * aspect_ratio)
+                if (rect_height >= startSizeH) and (rect_width >= startSizeW):
+                    scan_windows(matr, classifis, rect_width, rect_height, img_width, img_height, rectList)
 
     return rectList
+
+def scan_windows(matr, classifis, rect_width, rect_height, img_width, img_height, rectList):
+    global step
+    max_x = img_width - rect_width + 1
+    max_y = img_height - rect_height + 1
+    for x in range(0, max_x, step):
+        for y in range(0, max_y, step):
+            if checkWindow(matr, x, y, x + rect_width, y + rect_height, classifis):
+                rectList.append((x, y, x + rect_width, y + rect_height))
 
 def makeRects(image, rectList: list[(int, int, int, int)]):
     for i in rectList:
@@ -110,11 +103,8 @@ def makeRects(image, rectList: list[(int, int, int, int)]):
     return image
 
 def detect(imageName):
-    global startSizeW
-    global startSizeH
-    global maxSizeH
-    global maxSizeW
-    recList = []
+    maxSizeW = 0
+    maxSizeH = 0
     img = cv.imread(imageName)
 
     maxSizeH = img.shape[0]
@@ -133,4 +123,3 @@ def detect(imageName):
     image = makeRects(img, info)
     cv.imshow("windowName", image)
     cv.waitKey()
-
