@@ -2,6 +2,7 @@ import os
 import shutil
 from PIL import Image
 
+from data_yaml_maker import make_data_yaml
 from train_data_parser import parse_matlab
 
 DATASET_DIR = "dataset/cars_train/cars_train"
@@ -19,19 +20,6 @@ def makedir(dataset_path):
     os.mkdir(f"{yolo_dataset_path}/labels/train")
     os.mkdir(f"{yolo_dataset_path}/labels/val")
     return yolo_dataset_path
-
-
-# создание файла data.yaml
-def make_data_yaml(yolo_dataset_path):
-    yaml_path = f"{yolo_dataset_path}/data.yaml"
-    with open(yaml_path, "w") as file:
-        file.write(
-            f"path: {yolo_dataset_path}\n"
-            f"train: images/train\n"
-            f"val: images/val\n\n"
-            f"names:\n"
-            f"    0: Car\n"
-            f"    1: License plate\n")
 
 
 # преобразование данных из .matlab в YOLO
@@ -91,3 +79,5 @@ def data_refactoring(dataset_path):
                                f"{(source_coordinates[3] - source_coordinates[1]) / height} ")
             with open(new_bbox, "w") as file:
                 file.write(new_coordinates)
+
+data_refactoring(DATASET_DIR)

@@ -2,6 +2,7 @@ import os
 import shutil
 
 from darknet_parser import parse_darknet
+from data_yaml_maker import make_data_yaml
 
 DATASET_DIR = "empty_road/train"
 
@@ -20,19 +21,6 @@ def makedir(dataset_path):
     return yolo_dataset_path
 
 
-# создание файла data.yaml
-def make_data_yaml(yolo_dataset_path):
-    yaml_path = f"{yolo_dataset_path}/data.yaml"
-    with open(yaml_path, "w") as file:
-        file.write(
-            f"path: {yolo_dataset_path}\n"
-            f"train: images/train\n"
-            f"val: images/val\n\n"
-            f"names:\n"
-            f"    0: Car\n"
-            f"    1: License plate\n")
-
-
 # преобразование данных из .matlab в YOLO
 def data_refactoring(dataset_path):
     prefix_literal = dataset_path.split("/")[0]
@@ -41,7 +29,7 @@ def data_refactoring(dataset_path):
     train_size = int(dataset_size * 0.9)
     yolo_dataset_path = makedir(DATASET_DIR)
     make_data_yaml(yolo_dataset_path)
-    for i in range(train_size): # преобразование подмножества train
+    for i in range(train_size):  # преобразование подмножества train
         source_image = f"{DATASET_DIR}/{parsed_data[i]['image']}"
         new_image = f"{yolo_dataset_path}/images/train"
         source_bbox = f"{parsed_data[i]['image'][:-4]}.txt"
@@ -53,7 +41,7 @@ def data_refactoring(dataset_path):
         with open(new_bbox, "w") as file:
             file.write("")
 
-    for i in range(train_size, dataset_size): # преобразование подмножества validation
+    for i in range(train_size, dataset_size):  # преобразование подмножества validation
         source_image = f"{DATASET_DIR}/{parsed_data[i]['image']}"
         new_image = f"{yolo_dataset_path}/images/val"
         source_bbox = f"{parsed_data[i]['image'][:-4]}.txt"
@@ -64,5 +52,6 @@ def data_refactoring(dataset_path):
         shutil.copy(source_image, new_image)
         with open(new_bbox, "w") as file:
             file.write("")
+
 
 data_refactoring(DATASET_DIR)
