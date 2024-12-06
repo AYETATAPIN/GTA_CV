@@ -5,7 +5,7 @@ from PIL import Image
 from data_yaml_maker import make_data_yaml
 from train_data_parser import parse_matlab
 
-DATASET_DIR = "dataset/cars_train/cars_train"
+DATASET_DIR = "dataset/cars_train/cars_train"  # путь к датасету
 
 
 # создание директории с датасетом в формате YOLO
@@ -30,7 +30,7 @@ def data_refactoring(dataset_path):
     train_size = int(dataset_size * 0.9)
     yolo_dataset_path = makedir(DATASET_DIR)
     make_data_yaml(yolo_dataset_path)
-    for i in range(train_size): # преобразование подмножества train
+    for i in range(train_size):  # преобразование подмножества train
         source_image = f"{DATASET_DIR}/{parsed_data[i]['image'][0]}"
         new_image = f"{yolo_dataset_path}/images/train"
         shutil.copy(source_image, new_image)
@@ -48,14 +48,14 @@ def data_refactoring(dataset_path):
             height = float(height)
             source_coordinates = [float(coord) for coord in source_coordinates]
             new_coordinates = (f"0 "
-                               f"{(source_coordinates[0] + source_coordinates[2]) / (2 * width)} " # преобразование координат bbox'а
+                               f"{(source_coordinates[0] + source_coordinates[2]) / (2 * width)} "  # преобразование координат bbox'а
                                f"{(source_coordinates[1] + source_coordinates[3]) / (2 * height)} "
                                f"{(source_coordinates[2] - source_coordinates[0]) / width} "
                                f"{(source_coordinates[3] - source_coordinates[1]) / height} ")
             with open(new_bbox, "w") as file:
                 file.write(new_coordinates)
 
-    for i in range(train_size, dataset_size): # преобразование подмножества validation
+    for i in range(train_size, dataset_size):  # преобразование подмножества validation
         source_image = f"{DATASET_DIR}/{parsed_data[i]['image'][0]}"
         new_image = f"{yolo_dataset_path}/images/val"
         shutil.copy(source_image, new_image)
@@ -73,11 +73,9 @@ def data_refactoring(dataset_path):
             height = float(height)
             source_coordinates = [float(coord) for coord in source_coordinates]
             new_coordinates = (f"0 "
-                               f"{(source_coordinates[0] + source_coordinates[2]) / (2 * width)} " # преобразование координат bbox'а
+                               f"{(source_coordinates[0] + source_coordinates[2]) / (2 * width)} "  # преобразование координат bbox'а
                                f"{(source_coordinates[1] + source_coordinates[3]) / (2 * height)} "
                                f"{(source_coordinates[2] - source_coordinates[0]) / width} "
                                f"{(source_coordinates[3] - source_coordinates[1]) / height} ")
             with open(new_bbox, "w") as file:
                 file.write(new_coordinates)
-
-data_refactoring(DATASET_DIR)

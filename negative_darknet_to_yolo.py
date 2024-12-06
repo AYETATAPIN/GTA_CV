@@ -4,7 +4,7 @@ import shutil
 from darknet_parser import parse_darknet
 from data_yaml_maker import make_data_yaml
 
-DATASET_DIR = "empty_road/train"
+DATASET_DIR = "empty_road/train"  # путь к датасету
 
 
 # создание директории с датасетом в формате YOLO
@@ -52,6 +52,3 @@ def data_refactoring(dataset_path):
         shutil.copy(source_image, new_image)
         with open(new_bbox, "w") as file:
             file.write("")
-
-
-data_refactoring(DATASET_DIR)

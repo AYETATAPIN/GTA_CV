@@ -1,8 +1,9 @@
 import os
 
-DATASET_DIR = "empty_road/train"
+DATASET_DIR = "empty_road/train"  # путь к датасету
 
 
+# Парсер .darknet
 def parse_darknet(dataset_path):
     parsed_data = []
     files = os.listdir(dataset_path)

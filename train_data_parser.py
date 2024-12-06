@@ -59,7 +59,7 @@ def test_usage():
         first_img, first_name, first_bb = next(images)
 
         cv.rectangle(first_img, (first_bb[0], first_bb[1]), (first_bb[2], first_bb[3]), color=(0, 0, 255), thickness=2)
-        cv.putText(first_img, first_name, (first_bb[0] + 10, first_bb[1] - 10), cv.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 2)
+        cv.putText(first_img, first_name, (first_bb[0] + 10, first_bb[1] - 10), cv.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0),2)
         cv.imshow(first_name, first_img)
         cv.waitKey()
         cv.destroyWindow(first_name)

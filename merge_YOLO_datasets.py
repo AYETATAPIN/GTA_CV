@@ -3,10 +3,11 @@ import shutil
 
 from data_yaml_maker import make_data_yaml
 
-FIRST_DIR = "cars_train_to_YOLO"
-SECOND_DIR = "empty_road_to_YOLO"
+FIRST_DIR = "cars_train_to_YOLO"  # путь к первому датасету
+SECOND_DIR = "empty_road_to_YOLO"  # путь ко второму датасету
 
 
+# создание директории с объединенными датиасетами в формате YOLO
 def makedir(first_path, second_path):
     combined_folder = f"{first_path[:-8]}_and_{second_path[:-8]}_to_YOLO"
     os.mkdir(combined_folder)
@@ -19,11 +20,11 @@ def makedir(first_path, second_path):
     return combined_folder
 
 
+# копирование и переименование файлов в новую папку
 def copy_and_rename(path, combined_folder):
     images_count = 0
     labels_count = 0
     for root, dirs, files in os.walk(path):
-        print(root, dirs, files)
         subdirs = str(root).split("\\")
         if len(subdirs) > 1:
             if subdirs[-2] == "images":
@@ -33,8 +34,7 @@ def copy_and_rename(path, combined_folder):
                         source_image_name, source_image_extension = os.path.splitext(source_image)
                         new_image = f"{combined_folder}/images/train/{file}"
                         shutil.copy(source_image, f"{combined_folder}/images/train")
-                        os.rename(new_image,
-                                  f"{combined_folder}/images/train/{subdirs[0]}_{images_count}{source_image_extension}")
+                        os.rename(new_image,f"{combined_folder}/images/train/{subdirs[0]}_{images_count}{source_image_extension}")
                         images_count += 1
                 else:
                     for file in files:
@@ -42,10 +42,8 @@ def copy_and_rename(path, combined_folder):
                         source_image_name, source_image_extension = os.path.splitext(source_image)
                         new_image = f"{combined_folder}/images/val/{file}"
                         shutil.copy(source_image, f"{combined_folder}/images/val")
-                        os.rename(new_image,
-                                  f"{combined_folder}/images/val/{subdirs[0]}_{images_count}{source_image_extension}")
+                        os.rename(new_image,f"{combined_folder}/images/val/{subdirs[0]}_{images_count}{source_image_extension}")
                         images_count += 1
-                print("1")
             elif subdirs[-2] == "labels":
                 if subdirs[-1] == "train":
                     for file in files:
@@ -53,8 +51,7 @@ def copy_and_rename(path, combined_folder):
                         source_label_name, source_label_extension = os.path.splitext(source_label)
                         new_label = f"{combined_folder}/labels/train/{file}"
                         shutil.copy(source_label, f"{combined_folder}/labels/train")
-                        os.rename(new_label,
-                                  f"{combined_folder}/labels/train/{subdirs[0]}_{labels_count}{source_label_extension}")
+                        os.rename(new_label,f"{combined_folder}/labels/train/{subdirs[0]}_{labels_count}{source_label_extension}")
                         labels_count += 1
                 else:
                     for file in files:
@@ -62,16 +59,13 @@ def copy_and_rename(path, combined_folder):
                         source_label_name, source_label_extension = os.path.splitext(source_label)
                         new_label = f"{combined_folder}/labels/val/{file}"
                         shutil.copy(source_label, f"{combined_folder}/labels/val")
-                        os.rename(new_label,
-                                  f"{combined_folder}/labels/val/{subdirs[0]}_{labels_count}{source_label_extension}")
+                        os.rename(new_label,f"{combined_folder}/labels/val/{subdirs[0]}_{labels_count}{source_label_extension}")
                         labels_count += 1
 
 
+# копирование и переименование файлов из обоих датасетов
 def dataset_zip(first_path, second_path):
     combined_folder = makedir(first_path, second_path)
     make_data_yaml(combined_folder)
     copy_and_rename(first_path, combined_folder)
     copy_and_rename(second_path, combined_folder)
-
-
-dataset_zip(FIRST_DIR, SECOND_DIR)
