@@ -1,0 +1,8 @@
+#Предполагается, что этот файл лежит там же, где скрипты для обучения и детекции, а папка с датасетом называется "cars_dataset" и лежит в соседней папке "datasets"
+path: ../datasets/cars_dataset
+train: images/train
+val: images/val
+# Классы
+names:
+  0: car
+  1: license plate
