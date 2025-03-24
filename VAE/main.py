@@ -1,12 +1,6 @@
-import enum
-from re import match
-import re
-from typing import Iterator
-
-import numpy as np
 import torch.nn as nn
 import torch.optim
-from torch.nn import Parameter
+
 
 from myDataLoader import myDataLoader
 
@@ -14,6 +8,8 @@ hidden_dim = 20
 cnt_epochs = 100
 max_photo = 1000
 path_to_photo = ""
+path_to_save = 'D:\Documents\Pycharm Projects\VAE'
+name_of_model = 'model'
 
 class Vae(nn.Module):
     def __init__(self, hiddenShapes: [int] = None):
@@ -105,4 +101,4 @@ def mainTrain(epochs):
 
 if __name__ == "__main__":
     mainTrain(cnt_epochs)
-    torch.save(model, 'D:\\Documents\\Pycharm Projects\\VAE\\model.pth')
+    torch.save(model, path_to_save + '\\' + name_of_model + '.pth')
