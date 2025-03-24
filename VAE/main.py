@@ -19,7 +19,7 @@ class Vae(nn.Module):
 
 
         modules = []
-        if (hiddenShapes == None):
+        if hiddenShapes is None:
             hiddenShapes = [32, 64, 128, 256]
 
         self.encInChannels = 1
@@ -61,7 +61,7 @@ class Vae(nn.Module):
     def encode(self, x):
         z = self.encoder(x)
         return self.enc_mu(z), self.enc_var(z)
-        
+
     def reparam(self, mu, var):
         std = torch.exp(0.5*var)
         eps = torch.randn_like(std)
@@ -71,9 +71,9 @@ class Vae(nn.Module):
         return self.decoder(z)
 
     def forward(self, x):
-        mu, var = self.encoder(x)
+        mu, var = self.encode(x)
         z = self.reparam(mu, var)
-        return self.decoder(z)
+        return self.decode(z)
 
 model = Vae()
 optim = torch.optim.Adam(model.parameters())
