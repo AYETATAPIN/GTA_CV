@@ -117,10 +117,10 @@ if __name__ == "__main__":
     cursor = connection.cursor()
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS Cars (
-    id INTEGER PRIMARY KEY,
-    image_path TEXT NOT NULL,
     license_plate TEXT NOT NULL,
-    date_time TEXT NOT NULL 
+    date_time TEXT NOT NULL,
+    image_path TEXT NOT NULL,
+    PRIMARY KEY (license_plate, date_time)
     )''')
     #
     # date_time хранится в формате Year.Month.Date Hour:Min:Sec
