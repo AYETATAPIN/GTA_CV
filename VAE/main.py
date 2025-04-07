@@ -6,7 +6,7 @@ from torch import Tensor
 from myDataLoader import myDataSet
 
 startCh = 3
-hidden_dim = 20
+hidden_dim = 1000
 cnt_epochs = 100
 path_to_photo = "D:\\Documents\\Pycharm Projects\\Vae2\\cars\\cars"
 path_to_save = 'D:\\Documents\\Pycharm Projects\\Vae2'
