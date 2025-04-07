@@ -16,5 +16,5 @@ class myDataSet(Dataset):
 
         img = torchvision.io.read_image(self.dir + '\\' + self.images[index])
         img = self.tr(img)
-        img = img.to(torch.float32)
+        img = img.to(torch.float16)
         return img
