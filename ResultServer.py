@@ -2,14 +2,17 @@ import sqlite3
 import cv2 as cv
 import numpy as np
 import base64
-from flask import Flask, request, jsonify
+import datetime
+import os
+from flask import Flask, request, jsonify, abort
 
 app = Flask(__name__)
 images_folder = 'coded_images'
 
+
 def save_image(image, license_plate, date_time):
     coded_image = vae_coding(image)
-    image_path = images_folder + '/' + license_plate + date_time + '.bin'
+    image_path = os.path.join(images_folder, license_plate + date_time + '.bin')
 
     with open(image_path, 'wb') as file:
         file.write(coded_image)
@@ -49,20 +52,31 @@ def get_images_paths_from_db(license_plate):
 
 def get_images(license_plate):
     paths = get_images_paths_from_db(license_plate)
+    if len(paths) == 0:
+        abort(404)
     images = []
     for path in paths:
         with open(path, 'rb') as file:
             coded_image = np.frombuffer(file.read(), np.uint8)
             decoded_image = vae_decoding(coded_image)
             images.append(decoded_image)
-
     return tuple(images)
+
+
+def is_correct_datetime(date_time):
+    try:
+        datetime.datetime.strptime(date_time, "%Y.%m.%d %H:%M:%S")
+        return True
+    except ValueError:
+        return False
+
 
 @app.route('/')
 def greeting():
-  return '''Используйте /save с методом POST, чтобы сохранить изображение.
+    return '''Используйте /save с методом POST, чтобы сохранить изображение.
   Понадобится передать изображение, номер и дату+время.
   Используйте /<license_plate> GET, чтобы получить изображения по указанному номеру.'''
+
 
 @app.route('/save', methods=['POST'])
 def save_request():
@@ -70,17 +84,23 @@ def save_request():
     date_time = request.form.get('date_time')
 
     image_file = request.files['image']
+    if (license_plate == ""
+            or image_file.filename == "" or not is_correct_datetime(date_time)):
+        abort(400)
+
     image_array = np.frombuffer(image_file.read(), np.uint8)
 
     image = cv.imdecode(image_array, cv.IMREAD_COLOR)
-
     save_image(image, license_plate, date_time)
-    return "Success"
+    return "Success" + "| license-plate: " + license_plate + "| date-time: " + date_time
+
 
 def send_images(images):
     result = []
     for image in images:
-        _, coded_image = cv.imencode('.jpg', image)
+        res, coded_image = cv.imencode('.jpg', image)
+        if not res:
+            abort(500)
         result.append(base64.b64encode(coded_image).decode('utf-8'))
     return jsonify(result)
 
@@ -89,6 +109,7 @@ def send_images(images):
 def get_by_license_plate_request(license_plate):
     images = get_images(license_plate)
     return send_images(images)
+
 
 if __name__ == "__main__":
     # Удостоверились, что с базой всё в порядке
@@ -106,4 +127,4 @@ if __name__ == "__main__":
     connection.commit()
     connection.close()
 
-    app.run(debug=True)
+    app.run(port=50505)
