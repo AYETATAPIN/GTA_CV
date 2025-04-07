@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Автомобильные изображения</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Загрузка изображения</h1>
+    <form action="/save" method="post" enctype="multipart/form-data">
+        <label>Номер авто: <input type="text" name="license_plate" required></label>
+        <label>Дата и время (ГГГГ.ММ.ДД ЧЧ:ММ:СС):
+            <input type="text" name="date_time" required>
+        </label>
+        <label>Изображение: <input type="file" name="image" accept="image/*" required></label>
+        <button type="submit">Загрузить</button>
+    </form>
+
+    <h2>Поиск по номеру</h2>
+    <form action="/display" method="get">
+        <label>Номер авто: <input type="text" name="license_plate" required></label>
+        <button type="submit">Найти</button>
+    </form>
+</body>
+</html>
