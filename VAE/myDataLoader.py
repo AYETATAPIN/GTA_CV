@@ -1,24 +1,20 @@
-import torch
 import torchvision
+from torch.utils.data import Dataset
+import os
+import torch
 
-class myDataLoader:
-    def __init__(self, maxImg, path):
-        self.count = 0
-        self.max = maxImg
-        self.path = path
+class myDataSet(Dataset):
+    def __init__(self, dir):
+        self.dir = dir
+        self.tr = torchvision.transforms.Resize(size=(512, 512))
+        self.images = os.listdir(self.dir)
 
+    def __len__(self):
+        return len(self.images)
 
-    def getNext(self):
-        if self.count >= self.max:
-            return None
-        else:
-            value = torchvision.io.read_image(self.path + str(self.count) + '.jpg')
-            self.count += 1
-            tr = torchvision.transforms.Resize(size= (512, 256))
-            value = tr(value)
+    def __getitem__(self, index):
 
-            value = value.to(torch.float32)
-
-            value = value.unsqueeze(0)
-
-            return value
+        img = torchvision.io.read_image(self.dir + '\\' + self.images[index])
+        img = self.tr(img)
+        img = img.to(torch.float32)
+        return img
