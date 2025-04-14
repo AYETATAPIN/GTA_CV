@@ -17,8 +17,7 @@ label {
     margin: 10px 0;
 }
 
-input[type="text"],
-input[type="file"] {
+input[type="text"] {
     width: 100%;
     padding: 8px;
     margin: 5px 0;
