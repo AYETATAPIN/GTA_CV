@@ -1,3 +1,2 @@
-*.db
+coded_images/*
 __pycache__/*
-
