@@ -6,6 +6,7 @@ import cv2
 import detect
 import datetime
 import multiprocessing
+import json
 import requests
 
 PATH_TO_MEDIAMTX = "D:/prg/pycharm/projects/zmeyuka/mediamtx/mediamtx.exe"
@@ -40,8 +41,10 @@ def get_license_plate_text(path_to_license_plate, json_with_plate_text):
               f"{json_with_plate_text}.json"
               )
 
-def post_to_result_server(path_to_image):
 
+def post_to_result_server(path_to_image, json_with_plate_text):
+    # need to create a correct json to post
+    return requests.post("http://localhost:50505/savephoto", json=json_with_plate_text)
 
 
 def camera_handling(camera_url):
@@ -78,13 +81,20 @@ def camera_handling(camera_url):
         plates_folder = f"{PATH_TO_CROPS}/{crop_folder_name}/license plate"
         plates_images = [f for f in os.listdir(plates_folder) if os.path.isfile(os.path.join(plates_folder, f))]
 
+        # cars_folder = f"{PATH_TO_CROPS}/{crop_folder_name}/car"
+        # cars_images = [f for f in os.listdir(cars_folder) if os.path.isfile(os.path.join(cars_folder, f))]
+
         for plate_image in plates_images:
-            img_name, img_extension = os.path.splitext(plate_image)
-            json_with_plate_text = f"{img_name}.json"
+            plate_name, img_extension = os.path.splitext(plate_image)
+            json_with_plate_text = f"{plate_name}.json"
             get_plate_routine = multiprocessing.Process(target=get_license_plate_text,
                                                         args=(plate_image, json_with_plate_text,))
             get_plate_routine.start()
             get_plate_routine.join()
+            corresponding_car_name = plate_name.replace("license plate", "car")
+            corresponding_car_image = f"{corresponding_car_name}.jpg"
+            post_result = post_to_result_server(corresponding_car_image, json_with_plate_text)
+            print(post_result)
 
 
 if __name__ == "__main__":
