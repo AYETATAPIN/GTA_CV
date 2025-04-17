@@ -3,14 +3,14 @@ import uuid
 from time import sleep
 
 import cv2
-import detect
+import detect_configured
 import datetime
 import multiprocessing
 import json
 import requests
 
 PATH_TO_MEDIAMTX = "D:/prg/pycharm/projects/zmeyuka/mediamtx/mediamtx.exe"
-PATH_TO_STREAMING_FILE = "D:/prg/pycharm/projects/zmeyuka/yolov5/ts_streams/cars_test.ts"
+PATH_TO_STREAMING_FILE = "D:/prg/pycharm/projects/zmeyuka/yolov5/ts_streams/cars_report.ts"
 PATH_TO_WEIGHTS = "D:/prg/pycharm/projects/zmeyuka/yolov5/saved_models/processor_died1337/best.pt"
 PATH_TO_ORIGINS = "D:/prg/zalupen/origins"
 PATH_TO_CROPS = "D:/prg/zalupen/crops"
@@ -32,19 +32,25 @@ def start_camera_simualtion(path_to_media_mtx, path_to_streaming_file):
 
 
 def get_license_plate_text(path_to_license_plate, json_with_plate_text):
-    os.system(f"curl "
-              f"-X POST http://127.0.0.1:5000/ScreenTranslatorAPI/detect "
-              f"-H accept: application/json "
-              f"-H Content-Type: multipart/form-data "
-              f"-F file=@{path_to_license_plate};type=image/jpeg"
-              f"-o {os.path.splitext(os.path.basename(path_to_license_plate))[0]}"
-              f"{json_with_plate_text}.json"
-              )
+    with open(json_with_plate_text, "w") as file: # temporarily
+        file.write('{\n\t"detected_text": "911GG"\n}')
+    # os.system(f"curl "
+    #           f"-X POST http://127.0.0.1:5000/ScreenTranslatorAPI/detect "
+    #           f"-H accept: application/json "
+    #           f"-H Content-Type: multipart/form-data "
+    #           f"-F file=@{path_to_license_plate};type=image/jpeg"
+    #           f"-o {os.path.splitext(os.path.basename(path_to_license_plate))[0]}"
+    #           f"{json_with_plate_text}.json"
+    #           )
 
 
-def post_to_result_server(path_to_image, json_with_plate_text):
-    # need to create a correct json to post
-    return requests.post("http://localhost:50505/savephoto", json=json_with_plate_text)
+def post_to_result_server(path_to_image, json_with_plate_text, current_time):
+    json_file = json.loads(json_with_plate_text)
+    extracted_text = json_file["detected_text"]
+    files = {"upload_file": open(path_to_image, "rb")}
+    data = {"license plate": extracted_text,
+              "date_time": current_time}
+    return requests.post("http://127.0.0.1:50505/savephoto", files=files, data=data)
 
 
 def camera_handling(camera_url):
@@ -68,17 +74,21 @@ def camera_handling(camera_url):
         cv2.imwrite(img_name, camera_frame)
         crop_folder_name = f"{camera_name}__{current_time}__{os_random_int}"
 
-        detect.run(source=img_name,
-                   weights=PATH_TO_WEIGHTS,
-                   project=PATH_TO_CROPS,
-                   save_crop=True,
-                   name=crop_folder_name
-                   )
+        detect_configured.run(source=img_name,
+                              weights=PATH_TO_WEIGHTS,
+                              project=PATH_TO_CROPS,
+                              save_crop=True,
+                              save_txt=True,
+                              save_format=1,
+                              name=crop_folder_name
+                              )
         img_names[img_name] = 1
         cv2.imshow("RTSP camera", camera_frame)
         cv2.waitKey(1)
 
-        plates_folder = f"{PATH_TO_CROPS}/{crop_folder_name}/license plate"
+        plates_folder = f"{PATH_TO_CROPS}/{crop_folder_name}/License plate"
+        if os.path.isdir(plates_folder) is False:
+            print("N")
         plates_images = [f for f in os.listdir(plates_folder) if os.path.isfile(os.path.join(plates_folder, f))]
 
         # cars_folder = f"{PATH_TO_CROPS}/{crop_folder_name}/car"
@@ -91,9 +101,9 @@ def camera_handling(camera_url):
                                                         args=(plate_image, json_with_plate_text,))
             get_plate_routine.start()
             get_plate_routine.join()
-            corresponding_car_name = plate_name.replace("license plate", "car")
+            corresponding_car_name = plate_name.replace("License plate", "Car")
             corresponding_car_image = f"{corresponding_car_name}.jpg"
-            post_result = post_to_result_server(corresponding_car_image, json_with_plate_text)
+            post_result = post_to_result_server(corresponding_car_image, json_with_plate_text, current_time)
             print(post_result)
 
 
