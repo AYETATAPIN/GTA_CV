@@ -9,6 +9,7 @@ import multiprocessing
 import json
 import requests
 
+PATH_TO_RESULT_SERVER = "D:/prg/pycharm/projects/zmeyuka/yolov5/ResultServer.py"
 PATH_TO_MEDIAMTX = "D:/prg/pycharm/projects/zmeyuka/mediamtx/mediamtx.exe"
 PATH_TO_STREAMING_FILE = "D:/prg/pycharm/projects/zmeyuka/yolov5/ts_streams/cars_report.ts"
 PATH_TO_WEIGHTS = "D:/prg/pycharm/projects/zmeyuka/yolov5/saved_models/processor_died1337/best.pt"
@@ -31,8 +32,12 @@ def start_camera_simualtion(path_to_media_mtx, path_to_streaming_file):
               )
 
 
+def start_result_server(path_to_result_server):
+    os.system(f"start python {path_to_result_server}")
+
+
 def get_license_plate_text(path_to_license_plate, json_with_plate_text):
-    with open(json_with_plate_text, "w") as file: # temporarily
+    with open(json_with_plate_text, "w") as file:  # temporarily
         file.write('{\n\t"detected_text": "911GG"\n}')
     # os.system(f"curl "
     #           f"-X POST http://127.0.0.1:5000/ScreenTranslatorAPI/detect "
@@ -45,11 +50,12 @@ def get_license_plate_text(path_to_license_plate, json_with_plate_text):
 
 
 def post_to_result_server(path_to_image, json_with_plate_text, current_time):
-    json_file = json.loads(json_with_plate_text)
-    extracted_text = json_file["detected_text"]
-    files = {"upload_file": open(path_to_image, "rb")}
-    data = {"license plate": extracted_text,
-              "date_time": current_time}
+    with open(json_with_plate_text, "r") as file:
+        json_data = json.load(file)
+    extracted_text = json_data["detected_text"]
+    files = {"image": open(path_to_image, "rb")}
+    data = {"license_plate": extracted_text,
+            "date_time": current_time}
     return requests.post("http://127.0.0.1:50505/savephoto", files=files, data=data)
 
 
@@ -83,24 +89,31 @@ def camera_handling(camera_url):
                               name=crop_folder_name
                               )
         img_names[img_name] = 1
-        cv2.imshow("RTSP camera", camera_frame)
+        img_with_detection_name = f"{PATH_TO_CROPS}/{crop_folder_name}/{crop_folder_name}.jpg"
+        img_with_detection = cv2.imread(img_with_detection_name)
+        img_with_detection = cv2.resize(img_with_detection, (1280, 720))
+        # cv2.imshow("RTSP camera", camera_frame)
+        cv2.imshow("RTSP camera", img_with_detection)
         cv2.waitKey(1)
 
         plates_folder = f"{PATH_TO_CROPS}/{crop_folder_name}/License plate"
         if os.path.isdir(plates_folder) is False:
             print("N")
-        plates_images = [f for f in os.listdir(plates_folder) if os.path.isfile(os.path.join(plates_folder, f))]
+        plates_images = [f for f in os.listdir(plates_folder) if
+                         f[-3:] != "txt" and os.path.isfile(os.path.join(plates_folder, f))]
 
         # cars_folder = f"{PATH_TO_CROPS}/{crop_folder_name}/car"
         # cars_images = [f for f in os.listdir(cars_folder) if os.path.isfile(os.path.join(cars_folder, f))]
 
         for plate_image in plates_images:
             plate_name, img_extension = os.path.splitext(plate_image)
+            plate_name = f"{plates_folder}/{plate_name}"
             json_with_plate_text = f"{plate_name}.json"
-            get_plate_routine = multiprocessing.Process(target=get_license_plate_text,
-                                                        args=(plate_image, json_with_plate_text,))
-            get_plate_routine.start()
-            get_plate_routine.join()
+            # get_plate_routine = multiprocessing.Process(target=get_license_plate_text,
+            #                                             args=(plate_image, json_with_plate_text,))
+            # get_plate_routine.start()
+            # get_plate_routine.join()
+            get_license_plate_text(plate_image, json_with_plate_text)
             corresponding_car_name = plate_name.replace("License plate", "Car")
             corresponding_car_image = f"{corresponding_car_name}.jpg"
             post_result = post_to_result_server(corresponding_car_image, json_with_plate_text, current_time)
@@ -109,5 +122,6 @@ def camera_handling(camera_url):
 
 if __name__ == "__main__":
     start_camera_simualtion(PATH_TO_MEDIAMTX, PATH_TO_STREAMING_FILE)
+    start_result_server(PATH_TO_RESULT_SERVER)
     sleep(1)
     camera_handling(CAMERA_URL)
