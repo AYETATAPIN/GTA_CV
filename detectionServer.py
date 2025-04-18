@@ -20,6 +20,8 @@ CAMERA_URL = 'rtsp://localhost:8554/mystream'
 
 img_names = dict()  # 1 - processed, 0 - not
 
+MAX_BOUNDS_DIFFERENCE = 20
+
 
 def start_camera_simualtion(path_to_media_mtx, path_to_streaming_file):
     os.system(f"start {path_to_media_mtx}")
@@ -98,12 +100,18 @@ def camera_handling(camera_url):
 
         plates_folder = f"{PATH_TO_CROPS}/{crop_folder_name}/License plate"
         if os.path.isdir(plates_folder) is False:
-            print("N")
+            print("No license plates detected")
+            continue
         plates_images = [f for f in os.listdir(plates_folder) if
                          f[-3:] != "txt" and os.path.isfile(os.path.join(plates_folder, f))]
+        plates_labels = [f for f in os.listdir(plates_folder) if
+                         f[-3:] == "txt" and os.path.isfile(os.path.join(plates_folder, f))]
 
-        # cars_folder = f"{PATH_TO_CROPS}/{crop_folder_name}/car"
-        # cars_images = [f for f in os.listdir(cars_folder) if os.path.isfile(os.path.join(cars_folder, f))]
+        cars_folder = f"{PATH_TO_CROPS}/{crop_folder_name}/car"
+        cars_images = [f for f in os.listdir(cars_folder) if
+                       f[-3:] != "txt" and os.path.isfile(os.path.join(cars_folder, f))]
+        cars_labels = [f for f in os.listdir(cars_folder) if
+                       f[-3:] == "txt" and os.path.isfile(os.path.join(cars_folder, f))]
 
         for plate_image in plates_images:
             plate_name, img_extension = os.path.splitext(plate_image)
@@ -114,8 +122,31 @@ def camera_handling(camera_url):
             # get_plate_routine.start()
             # get_plate_routine.join()
             get_license_plate_text(plate_image, json_with_plate_text)
-            corresponding_car_name = plate_name.replace("License plate", "Car")
-            corresponding_car_image = f"{corresponding_car_name}.jpg"
+            plate_label = f"{plate_name}.txt"
+            with open(plate_label, "r") as file:
+                plate_coords = [int(coord) for coord in file.readline().split()]
+            plate_inside_car = False
+            for car_label in cars_labels:
+                car_name, img_extension = os.path.splitext(car_label)
+                car_name = f"{cars_folder}/{car_name}"
+                car_label = f"{car_name}.txt"
+                with open(car_label, "r") as file:
+                    car_coords = [int(coord) for coord in file.readline().split()]
+                    if (plate_coords[0] >= car_coords[0] or abs(
+                            plate_coords[0] - car_coords[0]) < MAX_BOUNDS_DIFFERENCE) and (
+                            plate_coords[2] <= car_coords[2] or abs(
+                        plate_coords[2] - car_coords[2]) < MAX_BOUNDS_DIFFERENCE) and (
+                            plate_coords[1] >= car_coords[1] or abs(
+                        plate_coords[1] - car_coords[1]) < MAX_BOUNDS_DIFFERENCE) and (
+                            plate_coords[3] <= car_coords[3] or abs(
+                        plate_coords[3] - car_coords[3]) < MAX_BOUNDS_DIFFERENCE):
+                        plate_inside_car = True
+                    if plate_inside_car == True:
+                        corresponding_car_image = car_label.replace("txt", "jpg")
+                        break
+            if plate_inside_car == False:
+                print(f"No car for plate {plate_name} with coordinates {plate_coords} was found")
+
             post_result = post_to_result_server(corresponding_car_image, json_with_plate_text, current_time)
             print(post_result)
 
