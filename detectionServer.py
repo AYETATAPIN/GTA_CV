@@ -12,13 +12,22 @@ import requests
 PATH_TO_RESULT_SERVER = "D:/prg/pycharm/projects/zmeyuka/yolov5/ResultServer.py"
 PATH_TO_MEDIAMTX = "D:/prg/pycharm/projects/zmeyuka/mediamtx/mediamtx.exe"
 PATH_TO_STREAMING_FILE = "D:/prg/pycharm/projects/zmeyuka/yolov5/ts_streams/cars_report.ts"
+CAMERA_URL = 'rtsp://localhost:8554/mystream'
+
 PATH_TO_WEIGHTS = "D:/prg/pycharm/projects/zmeyuka/yolov5/saved_models/processor_died1337/best.pt"
+
 PATH_TO_ORIGINS = "D:/prg/zalupen/origins"
 PATH_TO_CROPS = "D:/prg/zalupen/crops"
-CAMERA_URL = 'rtsp://localhost:8554/mystream'
 # ffmpeg -re -stream_loop -1 -i cars_test.ts -c copy -f rtsp -rtsp_transport tcp rtsp://localhost:8554/mystream
 
+FIRST_ENDPOINT_X = 100
+FIRST_ENDPOINT_Y = 100
+SECOND_ENDPOINT_X = 200
+SECOND_ENDPOINT_Y = 200
+
 img_names = dict()  # 1 - processed, 0 - not
+
+crossed_endpoint = dict() # 0 - none, 1 - first, 2 - second
 
 MAX_BOUNDS_DIFFERENCE = 20
 
@@ -88,7 +97,8 @@ def camera_handling(camera_url):
                               save_crop=True,
                               save_txt=True,
                               save_format=1,
-                              name=crop_folder_name
+                              name=crop_folder_name,
+                              conf_thres=0.5
                               )
         img_names[img_name] = 1
         img_with_detection_name = f"{PATH_TO_CROPS}/{crop_folder_name}/{crop_folder_name}.jpg"
@@ -122,6 +132,12 @@ def camera_handling(camera_url):
             # get_plate_routine.start()
             # get_plate_routine.join()
             get_license_plate_text(plate_image, json_with_plate_text)
+
+            with open(json_with_plate_text, "r") as file:
+                json_data = json.load(file)
+            extracted_text = json_data["detected_text"]
+            
+
             plate_label = f"{plate_name}.txt"
             with open(plate_label, "r") as file:
                 plate_coords = [int(coord) for coord in file.readline().split()]
@@ -132,6 +148,7 @@ def camera_handling(camera_url):
                 car_label = f"{car_name}.txt"
                 with open(car_label, "r") as file:
                     car_coords = [int(coord) for coord in file.readline().split()]
+
                     if (plate_coords[0] >= car_coords[0] or abs(
                             plate_coords[0] - car_coords[0]) < MAX_BOUNDS_DIFFERENCE) and (
                             plate_coords[2] <= car_coords[2] or abs(
@@ -146,9 +163,11 @@ def camera_handling(camera_url):
                         break
             if plate_inside_car == False:
                 print(f"No car for plate {plate_name} with coordinates {plate_coords} was found")
+                continue
 
             post_result = post_to_result_server(corresponding_car_image, json_with_plate_text, current_time)
             print(post_result)
+    cap.release()
 
 
 if __name__ == "__main__":
