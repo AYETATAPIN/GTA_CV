@@ -2,20 +2,22 @@ import torch.nn as nn
 import torch.optim
 import torch.utils.tensorboard as tensorboard
 from torch import Tensor
+import matplotlib.pyplot as plt
 
 from myDataLoader import myDataSet
 
 startCh = 3
-hidden_dim = 128
-cnt_epochs = 100
+hidden_dim = 64
+cnt_epochs = 20
 path_to_photo = "D:\\Documents\\Pycharm Projects\\Vae2\\cars\\cars"
 path_to_save = 'D:\\Documents\\Pycharm Projects\\Vae2'
-name_of_model = 'model'
+name_of_model = 'model1'
 is_my_KLD = False
-batch_size = 4
+batch_size = 1
 
 
-device = 'gpu' if torch.cuda.is_available() else 'cpu'
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 class Vae(nn.Module):
     def __init__(self):
@@ -27,48 +29,48 @@ class Vae(nn.Module):
 
 
 
-        self.ec1 = nn.Conv2d(3, 32, 3, stride=2, padding=1, dtype=torch.float16)
+        self.ec1 = nn.Conv2d(3, 32, 3, stride=2, padding=1)
         self.ec1A = nn.LeakyReLU()
-        self.ec2 = nn.Conv2d(32, 64, 3, stride=2, padding=1, dtype=torch.float16)
+        self.ec2 = nn.Conv2d(32, 64, 3, stride=2, padding=1)
         self.ec2A = nn.LeakyReLU()
-        self.ec3 = nn.Conv2d(64, 128, 3, stride=2, padding=1, dtype=torch.float16)
+        self.ec3 = nn.Conv2d(64, 128, 3, stride=2, padding=1)
         self.ec3A = nn.LeakyReLU()
-        self.ec4 = nn.Conv2d(128, 256, 3, stride=2, padding=1, dtype=torch.float16)
+        self.ec4 = nn.Conv2d(128, 256, 3, stride=2, padding=1)
         self.ec4A = nn.LeakyReLU()
-        self.ec5 = nn.Conv2d(256, 512, 3, stride=2, padding=1, dtype=torch.float16)
+        self.ec5 = nn.Conv2d(256, 512, 3, stride=2, padding=1)
         self.ec5A = nn.LeakyReLU()
-        self.ec6 = nn.Conv2d(512, 1024, 3, stride=2, padding=1, dtype=torch.float16)
+        self.ec6 = nn.Conv2d(512, 1024, 3, stride=2, padding=1)
         self.ec6A = nn.LeakyReLU()
-        self.ec7 = nn.Conv2d(1024, 2048, 3, stride=2, padding=1, dtype=torch.float16)
+        self.ec7 = nn.Conv2d(1024, 2048, 3, stride=2, padding=1)
         self.ec7A = nn.LeakyReLU()
-        self.ec8 = nn.Conv2d(2048, 4096, 3, stride=2, padding=1, dtype=torch.float16)
+        self.ec8 = nn.Conv2d(2048, 4096, 3, stride=2, padding=1)
         self.ec8A = nn.LeakyReLU()
-        self.ec9 = nn.Conv2d(4096, 8192, 3, stride=2, padding=1, dtype=torch.float16)
+        self.ec9 = nn.Conv2d(4096, 8192, 3, stride=2, padding=1)
         self.ec9A = nn.LeakyReLU()
 
         self.encFlatten = nn.Flatten(start_dim=1)
 
-        self.enc_mu = nn.Linear(8192, hidden_dim, dtype=torch.float16)
-        self.enc_var = nn.Linear(8192, hidden_dim, dtype=torch.float16)
+        self.enc_mu = nn.Linear(8192, hidden_dim)
+        self.enc_var = nn.Linear(8192, hidden_dim)
 
-        self.decoder_in = nn.Linear(hidden_dim, 8192, dtype=torch.float16)
-        self.dc1 = nn.ConvTranspose2d(8192, 4096, 3, stride=2, padding=1, output_padding=1, dtype=torch.float16)
+        self.decoder_in = nn.Linear(hidden_dim, 8192)
+        self.dc1 = nn.ConvTranspose2d(8192, 4096, 3, stride=2, padding=1, output_padding=1)
         self.dc1A = nn.LeakyReLU()
-        self.dc2 = nn.ConvTranspose2d(4096, 2048, 3, stride=2, padding=1, output_padding=1, dtype=torch.float16)
+        self.dc2 = nn.ConvTranspose2d(4096, 2048, 3, stride=2, padding=1, output_padding=1)
         self.dc2A = nn.LeakyReLU()
-        self.dc3 = nn.ConvTranspose2d(2048, 1024, 3, stride=2, padding=1, output_padding=1, dtype=torch.float16)
+        self.dc3 = nn.ConvTranspose2d(2048, 1024, 3, stride=2, padding=1, output_padding=1)
         self.dc3A = nn.LeakyReLU()
-        self.dc4 = nn.ConvTranspose2d(1024, 512, 3, stride=2, padding=1, output_padding=1, dtype=torch.float16)
+        self.dc4 = nn.ConvTranspose2d(1024, 512, 3, stride=2, padding=1, output_padding=1)
         self.dc4A = nn.LeakyReLU()
-        self.dc5 = nn.ConvTranspose2d(512, 256, 3, stride=2, padding=1, output_padding=1, dtype=torch.float16)
+        self.dc5 = nn.ConvTranspose2d(512, 256, 3, stride=2, padding=1, output_padding=1)
         self.dc5A = nn.LeakyReLU()
-        self.dc6 = nn.ConvTranspose2d(256, 128, 3, stride=2, padding=1, output_padding=1, dtype=torch.float16)
+        self.dc6 = nn.ConvTranspose2d(256, 128, 3, stride=2, padding=1, output_padding=1)
         self.dc6A = nn.LeakyReLU()
-        self.dc7 = nn.ConvTranspose2d(128, 64, 3, stride=2, padding=1, output_padding=1, dtype=torch.float16)
+        self.dc7 = nn.ConvTranspose2d(128, 64, 3, stride=2, padding=1, output_padding=1)
         self.dc7A = nn.LeakyReLU()
-        self.dc8 = nn.ConvTranspose2d(64, 32, 3, stride=2, padding=1, output_padding=1, dtype=torch.float16)
+        self.dc8 = nn.ConvTranspose2d(64, 32, 3, stride=2, padding=1, output_padding=1)
         self.dc8A = nn.LeakyReLU()
-        self.dc9 = nn.ConvTranspose2d(32, startCh, 3, stride=2, padding=1, output_padding=1, dtype=torch.float16)
+        self.dc9 = nn.ConvTranspose2d(32, startCh, 3, stride=2, padding=1, output_padding=1)
         self.dc9A = nn.LeakyReLU()
 
 
@@ -105,6 +107,7 @@ class Vae(nn.Module):
         z = self.dc9A(self.dc9(z))
         return z
 
+
     def forward(self, x):
         mu, var = self.encode(x)
         z = self.reparam(mu, var)
@@ -115,6 +118,7 @@ model = Vae().to(device)
 optim = torch.optim.SGD(model.parameters())
 loader = torch.utils.data.DataLoader(myDataSet(path_to_photo), shuffle=True, batch_size=batch_size)
 logger = tensorboard.SummaryWriter(log_dir='logging')
+scalar = torch.amp.GradScaler()
 
 
 def getLoss(myx, x, mu, var):
@@ -123,32 +127,51 @@ def getLoss(myx, x, mu, var):
     if is_my_KLD:
         DKL = -0.5 * torch.sum(1 + var - mu.pow(2) - var.exp())
     else:
-        DKL = nn.functional.kl_div(myx, x)
+        DKL = nn.functional.kl_div(myx, x, reduction="batchmean")
 
     return RecLoss + DKL
-
 
 
 def train(epoch):
 
     sum_losses: Tensor = torch.zeros(1)
+    sum_losses = sum_losses.to(device)
     it = 0
     for img in loader:
 
         print(f'img num = {it*batch_size} - {(it + 1)*batch_size - 1}')
         it += 1
         optim.zero_grad()
-        myImg, mu, var = model.forward(img)
-        losses = getLoss(myImg, img, mu, var)
+        with torch.amp.autocast(device_type=device, dtype=torch.float16):
+            myImg, mu, var = model.forward(img)
+            losses = getLoss(myImg, img, mu, var)
+
         sum_losses += losses
-        losses.backward()
-        optim.step()
+        scalar.scale(losses).backward()
+        scalar.step(optim)
+        scalar.update()
 
-
+    torch.save(model.state_dict(), path_to_save + '\\' + name_of_model + 'Epoch' + str(epoch) + '.pt')
     logger.add_scalar('Loss', sum_losses, epoch)
 
 
 
+def watchImg():
+    img = loader.dataset.__getitem__(0)
+    with torch.amp.autocast(device_type=device, dtype=torch.float16):
+        myImg, mu, var = model.forward(img.view(1, 3, 512, 512))
+
+    img = img.cpu() * 256
+    img = img.to(torch.uint8)
+    plt.imshow(torch.permute(img, (1, 2, 0)).numpy())
+    myImg = myImg[0].cpu() * 256
+    myImg = myImg.to(torch.uint8)
+    plt.imshow(torch.permute(myImg * 256, (1, 2, 0)).numpy())
+    plt.show()
+
+def loadModel(pathToModel):
+    model.load_state_dict(torch.load(pathToModel, weights_only=True))
+    model.eval()
 
 def mainTrain(epochs):
     model.train()
@@ -159,5 +182,5 @@ def mainTrain(epochs):
 
 
 if __name__ == "__main__":
-    mainTrain(cnt_epochs)
-    torch.save(model, path_to_save + '\\' + name_of_model + '.pth')
+    loadModel('D:\\Documents\\Pycharm Projects\\Vae2\\model1Epoch19.pt')
+    watchImg()

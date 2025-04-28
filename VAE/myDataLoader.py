@@ -3,6 +3,8 @@ from torch.utils.data import Dataset
 import os
 import torch
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 class myDataSet(Dataset):
     def __init__(self, dir):
         self.dir = dir
@@ -17,4 +19,8 @@ class myDataSet(Dataset):
         img = torchvision.io.read_image(self.dir + '\\' + self.images[index])
         img = self.tr(img)
         img = img.to(torch.float16)
+
+        img = img / 256
+
+        img = img.to(device)
         return img
