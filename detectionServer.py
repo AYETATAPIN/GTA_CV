@@ -10,11 +10,12 @@ import json
 import requests
 
 PATH_TO_RESULT_SERVER = "D:/prg/pycharm/projects/zmeyuka/yolov5/ResultServer.py"
+PATH_TO_TEXT_EXTRACTION_SERVER = "D:/prg/pycharm/projects/zmeyuka/yolov5/Server/server.py"
 PATH_TO_MEDIAMTX = "D:/prg/pycharm/projects/zmeyuka/mediamtx/mediamtx.exe"
-PATH_TO_STREAMING_FILE = "D:/prg/pycharm/projects/zmeyuka/yolov5/ts_streams/cars_report.ts"
+PATH_TO_STREAMING_FILE = "D:/prg/pycharm/projects/zmeyuka/yolov5/ts_streams/cars_road.ts"
 CAMERA_URL = 'rtsp://localhost:8554/mystream'
 
-PATH_TO_WEIGHTS = "D:/prg/pycharm/projects/zmeyuka/yolov5/saved_models/processor_died1337/best.pt"
+PATH_TO_WEIGHTS = "D:/prg/pycharm/projects/zmeyuka/yolov5/saved_models/kaggle_trained/weights/best.pt"
 
 PATH_TO_ORIGINS = "D:/prg/zalupen/origins"
 PATH_TO_CROPS = "D:/prg/zalupen/crops"
@@ -50,17 +51,15 @@ def start_result_server(path_to_result_server):
     os.system(f"start python {path_to_result_server}")
 
 
+def start_text_extraction_server(path_to_extraction_server):
+    os.system(f"start python {path_to_extraction_server}")
+
+
 def get_license_plate_text(path_to_license_plate, json_with_plate_text):
-    with open(json_with_plate_text, "w") as file:  # temporarily
-        file.write('{\n\t"detected_text": "911GG"\n}')
-    # os.system(f"curl "
-    #           f"-X POST http://127.0.0.1:5000/ScreenTranslatorAPI/detect "
-    #           f"-H accept: application/json "
-    #           f"-H Content-Type: multipart/form-data "
-    #           f"-F file=@{path_to_license_plate};type=image/jpeg"
-    #           f"-o {os.path.splitext(os.path.basename(path_to_license_plate))[0]}"
-    #           f"{json_with_plate_text}.json"
-    #           )
+    # with open(json_with_plate_text, "w") as file:  # temporarily
+    #     file.write('{\n\t"detected_text": "911GG"\n}')
+    files = {"File": open(path_to_license_plate, "rb")}
+    return requests.post("http://127.0.0.1:5000/ScreenTranslatorAPI/imageDetect", files=files)
 
 
 def post_to_result_server(path_to_image, json_with_plate_text, current_time):
@@ -74,7 +73,8 @@ def post_to_result_server(path_to_image, json_with_plate_text, current_time):
 
 
 def camera_handling(camera_url):
-    cap = cv2.VideoCapture(camera_url)
+    # cap = cv2.VideoCapture(camera_url)
+    cap = cv2.VideoCapture("cars.mp4")
 
     width_org = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height_org = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -133,17 +133,22 @@ def camera_handling(camera_url):
 
         for plate_image in plates_images:
             plate_name, img_extension = os.path.splitext(plate_image)
+            plate_img_path = f"{plates_folder}/{plate_image}"
             plate_name = f"{plates_folder}/{plate_name}"
             json_with_plate_text = f"{plate_name}.json"
             # get_plate_routine = multiprocessing.Process(target=get_license_plate_text,
             #                                             args=(plate_image, json_with_plate_text,))
             # get_plate_routine.start()
             # get_plate_routine.join()
-            get_license_plate_text(plate_image, json_with_plate_text)
+            plate_response_body = get_license_plate_text(plate_img_path, json_with_plate_text).json()
+            extracted_text = plate_response_body["Detected text"]
+            print(f"\n\n\n {type(extracted_text), extracted_text, plate_name} \n\n\n")
+            with open(json_with_plate_text, "w") as file:
+                file.write(f"{{\n\t\"detected_text\": \"{extracted_text}\"\n}}")
 
-            with open(json_with_plate_text, "r") as file:
-                json_data = json.load(file)
-            extracted_text = json_data["detected_text"]
+            # with open(json_with_plate_text, "r") as file:
+            #     json_data = json.load(file)
+            # extracted_text = json_data["detected_text"
 
             if crossed_endpoint.get(extracted_text, -1) == -1:
                 # crossed_endpoint[extracted_text] = {0, 0, 0}
@@ -195,21 +200,33 @@ def camera_handling(camera_url):
             post_result = post_to_result_server(corresponding_car_image, json_with_plate_text, current_time)
             print(post_result)
             if crossed_endpoint[extracted_text][2] != "undefined" and crossed_endpoint[extracted_text][2] < 0:
-                print(f"Unexpected speed '{crossed_endpoint[extracted_text][2]}' of car with license plate {extracted_text}")
+                print(
+                    f"Unexpected speed '{crossed_endpoint[extracted_text][2]}' of car with license plate {extracted_text}")
             cv2.putText(img_with_detection,
-                        str(crossed_endpoint[extracted_text][2]),
-                        (int(car_coords[0] + 10), int(car_coords[1] + 50)),
+                        f"License plate: {extracted_text}",
+                        (int(car_coords[0] + 10), int(car_coords[1] + 40)),
                         cv2.FONT_HERSHEY_DUPLEX,
-                        2,
+                        1,
                         (0, 0, 255),
                         2)
+            cv2.putText(img_with_detection,
+                        f"Speed: {str(crossed_endpoint[extracted_text][2])}",
+                        (int(car_coords[0] + 10), int(car_coords[1] + 90)),
+                        cv2.FONT_HERSHEY_DUPLEX,
+                        1,
+                        (0, 0, 255),
+                        2)
+        img_with_detection = cv2.resize(img_with_detection, (1280, 720))
         cv2.imshow("RTSP camera", img_with_detection)
         cv2.waitKey(1)
     cap.release()
 
-
-if __name__ == "__main__":
+def main():
     start_camera_simualtion(PATH_TO_MEDIAMTX, PATH_TO_STREAMING_FILE)
     start_result_server(PATH_TO_RESULT_SERVER)
+    start_text_extraction_server(PATH_TO_TEXT_EXTRACTION_SERVER)
     sleep(1)
     camera_handling(CAMERA_URL)
+
+if __name__ == "__main__":
+    main()

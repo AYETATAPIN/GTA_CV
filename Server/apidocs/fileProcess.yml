@@ -1,0 +1,66 @@
+Обработка изображения/видео
+---
+tags:
+  - Screen Translator API
+description: 
+  "Загружает изображение/видео и применяет модель для распознавания 
+  текста, переводит его и генерирует изображение/видео с bounding box, 
+  а также изображение/видео с наложенным переведённым текстом.
+      
+  Возвращает результат в формате JSON: массив покадрово распознанного текста, 
+  массив покадрово переведённого текста, а также URL ссылки на сгенерированные файлы.
+
+  Если передано изображение, массивы текстов состоят из одного элемента."
+
+consumes:
+  - multipart/form-data
+produces:
+  - application/json      
+parameters:
+  - name: File
+    in: formData
+    type: file
+    required: true
+    description: Изображение или видео для обработки
+
+responses:
+  200:
+    description: Успех
+    schema:
+      type: object
+      properties:
+        Recognized text:
+          type: array
+          items:
+            type: string
+          example: ["Text from frame 1 (or just image)", "Text from frame 2"]
+        Translated text:
+          type: array
+          items:
+            type: string
+          example: ["Текст из кадра 1 (или просто изображения)", "Текст из кадра 2"]
+        Boxed url:
+          type: string
+          example: "/ScreenTranslatorAPI/boxed/<filename>"
+        Translated url:
+          type: string
+          example: "/ScreenTranslatorAPI/translated/<filename>"
+  400:
+    description: Ошибка на стороне клиента
+    schema:
+      type: object
+      properties:
+        Error:
+          type: string
+          example: "No file uploaded <or> Unsupported file format"
+  500:
+    description: Ошибка на стороне сервера
+    schema:
+      type: object
+      properties:
+        Error:
+          type: string
+          example: "Processing failed"
+        Error details:
+          type: string
+          example: "Error description here"
