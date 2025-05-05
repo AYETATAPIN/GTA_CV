@@ -4,6 +4,7 @@ import sqlite3
 
 
 def clear_table():
+    db.db_name = "test.db"
     connection = sqlite3.connect(db.db_name)
     cursor = connection.cursor()
     cursor.execute("DROP TABLE IF EXISTS Cars")
