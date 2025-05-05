@@ -8,7 +8,7 @@ def clear_table():
     connection = sqlite3.connect(db.db_name)
     cursor = connection.cursor()
     cursor.execute("DROP TABLE IF EXISTS Cars")
-    cursor.execute("DROP TABLE IF EXISTS Photoes")
+    cursor.execute("DROP TABLE IF EXISTS Photos")
     connection.commit()
     connection.close()
 
@@ -28,13 +28,13 @@ def table_exists(table_name):
 def test_start():  # Успешно ли создается таблица
     clear_table()
     assert not table_exists('Cars')
-    assert not table_exists('Photoes')
+    assert not table_exists('Photos')
     db.start_validation()
     assert table_exists('Cars')
-    assert table_exists('Photoes')
+    assert table_exists('Photos')
     db.start_validation()  # Не крашится ли после второго использования
     assert table_exists('Cars')
-    assert table_exists('Photoes')
+    assert table_exists('Photos')
 
 
 def test_save_car_1():  # Корректно ли добавляется запись и не меняется ли при втором использовании
@@ -131,13 +131,13 @@ def test_save_photo_1():  # корректность добавления фот
     db.save_photo_to_db("just_folder/pupupu.bin", "123", "1871.1.17 12:0:0")
     connect = sqlite3.connect(db.db_name)
     cursor = connect.cursor()
-    cursor.execute("SELECT * FROM Photoes WHERE license_plate = 123")
+    cursor.execute("SELECT * FROM Photos WHERE license_plate = 123")
     l = cursor.fetchall()
     assert len(l) == 1
     assert l[0][3] == 'just_folder/pupupu.bin'
     assert l[0][1] == '123'
     assert l[0][2] == "1871.1.17 12:0:0"
-    cursor.execute("SELECT * FROM Photoes")
+    cursor.execute("SELECT * FROM Photos")
     l = cursor.fetchall()
     assert len(l) == 1
     connect.close()
@@ -150,19 +150,19 @@ def test_save_photo_2():  # корректность добавления нес
     db.save_photo_to_db("just_folder/asd.bin", "234", "1871.1.17 12:12:0")
     connect = sqlite3.connect(db.db_name)
     cursor = connect.cursor()
-    cursor.execute("SELECT * FROM Photoes WHERE license_plate = 123")
+    cursor.execute("SELECT * FROM Photos WHERE license_plate = 123")
     l = cursor.fetchall()
     assert len(l) == 1
     assert l[0][3] == 'just_folder/pupupu.bin'
     assert l[0][1] == '123'
     assert l[0][2] == "1871.1.17 12:0:0"
-    cursor.execute("SELECT * FROM Photoes WHERE license_plate = 234")
+    cursor.execute("SELECT * FROM Photos WHERE license_plate = 234")
     l = cursor.fetchall()
     assert len(l) == 1
     assert l[0][3] == 'just_folder/asd.bin'
     assert l[0][1] == '234'
     assert l[0][2] == "1871.1.17 12:12:0"
-    cursor.execute("SELECT * FROM Photoes")
+    cursor.execute("SELECT * FROM Photos")
     l = cursor.fetchall()
     assert len(l) == 2
     connect.close()
@@ -175,7 +175,7 @@ def test_save_photo_2():  # корректность добавления нес
     db.save_photo_to_db("just_folder/asd.bin", "123", "1871.1.17 12:12:0")
     connect = sqlite3.connect(db.db_name)
     cursor = connect.cursor()
-    cursor.execute("SELECT * FROM Photoes WHERE license_plate = 123")
+    cursor.execute("SELECT * FROM Photos WHERE license_plate = 123")
     l = cursor.fetchall()
     assert len(l) == 2
     assert l[0][3] == 'just_folder/pupupu.bin'
@@ -185,7 +185,7 @@ def test_save_photo_2():  # корректность добавления нес
     assert l[1][3] == 'just_folder/asd.bin'
     assert l[1][1] == '123'
     assert l[1][2] == "1871.1.17 12:12:0"
-    cursor.execute("SELECT * FROM Photoes")
+    cursor.execute("SELECT * FROM Photos")
     l = cursor.fetchall()
     assert len(l) == 2
     connect.close()

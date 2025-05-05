@@ -1,5 +1,5 @@
 import sqlite3
-db_name = "cars_v1.db"
+db_name = "cars_v2.db"
 
 def start_validation():
     # Удостоверились, что с базой всё в порядке
@@ -13,7 +13,7 @@ def start_validation():
     PRIMARY KEY (license_plate)
     )''')
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS Photoes (
+    CREATE TABLE IF NOT EXISTS Photos (
     id INTEGER PRIMARY KEY,
     license_plate TEXT NOT NULL,
     date_time TEXT NOT NULL,
@@ -28,7 +28,7 @@ def start_validation():
 def save_photo_to_db(image_path, license_plate, date_time):  # str, str, str
     connection = sqlite3.connect(db_name)
     cursor = connection.cursor()
-    cursor.execute('INSERT INTO Photoes (image_path, license_plate, date_time) VALUES (?, ?, ?)',
+    cursor.execute('INSERT INTO Photos (image_path, license_plate, date_time) VALUES (?, ?, ?)',
                    (image_path, license_plate, date_time))
     connection.commit()
     connection.close()
@@ -49,7 +49,7 @@ def save_car_to_db(license_plate, model=None, owner=None):
 def get_images_paths_from_db(license_plate):
     connection = sqlite3.connect(db_name)
     cursor = connection.cursor()
-    cursor.execute('SELECT image_path FROM Photoes WHERE license_plate = ?', (license_plate,))
+    cursor.execute('SELECT image_path FROM Photos WHERE license_plate = ?', (license_plate,))
     paths = cursor.fetchall()
     connection.close()
     result = tuple(element[0] for element in paths)
