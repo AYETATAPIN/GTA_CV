@@ -6,13 +6,12 @@ import os
 from flask import Flask, request, jsonify
 import DB_managing as db
 app = Flask(__name__)
-images_folder = "D:/prg/pycharm/projects/zmeyuka/yolov5/coded_images"
+images_folder = 'coded_images'
 
 
 def save_photo(image, license_plate, date_time):
     coded_image = vae_coding(image)
     image_path = os.path.join(images_folder, license_plate + date_time + '.bin')
-    # mkdir(images_folder) exists=ok
     with open(image_path, 'wb') as file:
         file.write(coded_image)
 
