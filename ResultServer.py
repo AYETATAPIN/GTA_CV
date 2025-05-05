@@ -12,7 +12,6 @@ images_folder = 'coded_images'
 def save_photo(image, license_plate, date_time):
     coded_image = vae_coding(image)
     image_path = os.path.join(images_folder, license_plate + date_time + '.bin')
-
     with open(image_path, 'wb') as file:
         file.write(coded_image)
 
@@ -45,7 +44,7 @@ def get_images(license_plate):
 
 def is_correct_datetime(date_time):
     try:
-        datetime.datetime.strptime(date_time, "%Y.%m.%d %H:%M:%S")
+        datetime.datetime.strptime(date_time, "%Y_%m_%d_%H_%M_%S")
         return True
     except ValueError:
         return False
@@ -81,7 +80,7 @@ def save_car_request():
     model = request.form.get('model')
     owner = request.form.get('owner')
 
-    if (license_plate == ""):
+    if license_plate == "":
         return 'wrong request', 400
 
 
