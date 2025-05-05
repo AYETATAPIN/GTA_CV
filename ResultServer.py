@@ -45,7 +45,7 @@ def get_images(license_plate):
 
 def is_correct_datetime(date_time):
     try:
-        datetime.datetime.strptime(date_time, "%Y.%m.%d %H:%M:%S")
+        datetime.datetime.strptime(date_time, "%Y_%m_%d_%H_%M_%S")
         return True
     except ValueError:
         return False
