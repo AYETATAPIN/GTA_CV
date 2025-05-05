@@ -6,8 +6,7 @@ import os
 
 def license_plate_pars(license_dir):
     if not os.path.isdir(license_dir):
-        print(f"Директория {license_dir} не найдена.")
-        sys.exit(1)
+        return "badDirectory", []
 
     image_files = []
     supported_ext = ('.jpg', '.jpeg')
