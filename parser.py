@@ -6,7 +6,7 @@ import os
 
 def license_plate_pars(license_dir):
     if not os.path.isdir(license_dir):
-        return "badDirectory", []
+        return "BadDirectory", []
 
     image_files = []
     supported_ext = ('.jpg', '.jpeg')
