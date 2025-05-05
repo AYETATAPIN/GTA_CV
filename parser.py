@@ -2,24 +2,22 @@ from PIL import Image
 import sys
 import os
 
-def main():
-    if not os.path.isdir("images"):
-        print("Папка 'images' не найдена.")
+def license_plate_pars(license_dir):
+    if not os.path.isdir(license_dir):
+        print(f"Директория {license_dir} не найдена.")
         sys.exit(1)
 
     image_files = []
-    supported_ext = ('.jpg', '.jpeg', '.png', '.gif', '.bmp')
+    supported_ext = ('.jpg', '.jpeg')
 
-    for filename in os.listdir("images"):
+    for filename in os.listdir(license_dir):
         if filename.lower().endswith(supported_ext):
-            file_path = os.path.join("images", filename)
+            file_path = os.path.join(license_dir, filename)
             if os.path.isfile(file_path):
                 image_files.append(file_path)
 
-    image_files.sort()
-
     if not image_files:
-        print("В папке 'images' нет подходящих изображений.")
+        print(f"В директории {license_dir} нет подходящих изображений.")
         sys.exit(1)
 
     images = []
@@ -55,10 +53,7 @@ def main():
         current_y += img.height
 
     new_image.save('output.jpg')
-
-    with open('output.txt', 'w') as f:
-        for y in y_coordinates:
-            f.write(f"{y}\n")
+    return "output", y_coordinates
 
 if __name__ == "__main__":
-    main()
+    print(license_plate_pars("images"))
