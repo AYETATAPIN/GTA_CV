@@ -1,3 +1,5 @@
+import uuid
+
 from PIL import Image
 import sys
 import os
@@ -33,12 +35,10 @@ def license_plate_pars(license_dir):
             if width > max_width:
                 max_width = width
         except Exception as e:
-            print(f"Ошибка при обработке файла {img_path}: {e}")
-            continue
+            return f"BadImage {img_path} with {e}", []
 
     if not images:
-        print("Не удалось загрузить ни одного изображения.")
-        sys.exit(1)
+        return "BadImages", []
 
     total_height = sum(heights)
 
@@ -52,8 +52,9 @@ def license_plate_pars(license_dir):
         new_image.paste(img, (x_offset, current_y))
         current_y += img.height
 
-    new_image.save('output.jpg')
-    return "output", y_coordinates
+    str_name = str(uuid.uuid4())
+    new_image.save(str_name + '.jpg')
+    return str_name, y_coordinates
 
 if __name__ == "__main__":
     print(license_plate_pars("images"))
