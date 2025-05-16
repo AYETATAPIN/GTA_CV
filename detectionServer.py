@@ -33,22 +33,25 @@ crossed_endpoint = dict()  # [0 - none, 1 - first, 2 - second ; crossed timecode
 
 MAX_BOUNDS_DIFFERENCE = 5
 
+REGION = "RUS"
+
 
 def get_texts_from_letters(letters, plate_names_and_y_coords):
-    return None
-
-
-def plate_inside_car(plate_coords, car_coords):
-    if (plate_coords[0] >= car_coords[0] or abs(
-            plate_coords[0] - car_coords[0]) < MAX_BOUNDS_DIFFERENCE) and (
-            plate_coords[2] <= car_coords[2] or abs(
-        plate_coords[2] - car_coords[2]) < MAX_BOUNDS_DIFFERENCE) and (
-            plate_coords[1] >= car_coords[1] or abs(
-        plate_coords[1] - car_coords[1]) < MAX_BOUNDS_DIFFERENCE) and (
-            plate_coords[3] <= car_coords[3] or abs(
-        plate_coords[3] - car_coords[3]) < MAX_BOUNDS_DIFFERENCE):
-        return True
-    return False
+    ans = {}
+    plate_names_and_y_coords = sorted(plate_names_and_y_coords, key=lambda y: y[1])
+    letters = sorted(letters, key=lambda x: x[1][0])
+    for i in range(len(plate_names_and_y_coords)):
+        word = ""
+        for new_el in letters:
+            if (new_el[1][1] >= plate_names_and_y_coords[i][1]
+                    and (i == len(plate_names_and_y_coords) - 1 or new_el[1][1] <= plate_names_and_y_coords[i + 1][1])):
+                if (REGION == "RUS"):
+                    s = new_el[0]
+                    if (s == "R" or s == "U" or s == "S"):
+                        continue
+                word = word + new_el[0]
+        ans[plate_names_and_y_coords[0]] = word
+    return ans
 
 
 def calc_distance(plate_coords, car_coords):
@@ -257,7 +260,6 @@ def start_footage_processing(camera_url):
 
             if crossed_endpoint.get(extracted_text, -1) == -1:
                 crossed_endpoint[extracted_text] = [0, 0, "undefined"]
-
 
             with open(plate_label, "r") as file:
                 plate_coords = [int(coord) for coord in file.readline().split()]
