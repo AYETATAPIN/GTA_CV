@@ -37,7 +37,7 @@ def save_car_to_db(license_plate, model=None, owner=None):
     connection = sqlite3.connect(db_name)
     cursor = connection.cursor()
     ans = cursor.execute("SELECT 1 FROM Cars WHERE license_plate = ?",(license_plate,))
-    if(len(ans.fetchall()) > 0):
+    if len(ans.fetchall()) > 0:
         cursor.execute('UPDATE Cars SET model = ?, owner = ? WHERE license_plate = ?',
                        (model, owner, license_plate))
     else:
