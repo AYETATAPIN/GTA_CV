@@ -35,7 +35,7 @@ def makedirs():
 
 
 def get_texts_from_letters(letters, plate_names_and_y_coords):
-    ans = {}
+    ans = dict()
     plate_names_and_y_coords = sorted(plate_names_and_y_coords, key=lambda x: x[1])
     letters = sorted(letters, key=lambda x: (x[0][1]['y_min'], x[0][1]['x_min']))
 
@@ -65,6 +65,74 @@ def get_texts_from_letters(letters, plate_names_and_y_coords):
 
         ans[plate_names_and_y_coords[i][0]] = word
     return ans
+
+
+def correct_plate_texts(corresponding_plates_texts):
+    letter_replacements = {
+        '4': 'A',
+        '8': 'B',
+        'R': 'K',
+        'N': 'M',
+        '0': 'O',
+        'Q': 'O',
+        'D': 'O',
+        'F': 'P',
+        'W': 'Y',
+        'U': 'Y',
+        'V': 'X'
+    }
+
+    digit_replacements = {
+        'O': '0',
+        'Q': '0',
+        'D': '0',
+        'I': '1',
+        'T': '1',
+        'Z': '2',
+        'A': '4',
+        'S': '5',
+        'B': '8',
+        'E': '8'
+    }
+
+    valid_letters = set("ABEKMHOPCTYX")
+    valid_digits = set("0123456789")
+    max_length = 6
+
+    corrected_plates_texts = dict()
+
+    for plate_name, plate_text in corresponding_plates_texts.items():
+        text = plate_text.upper()
+        corrected_text = ""
+        i = 0
+        j = 0
+
+        while i < max_length and (i + j) < len(text):
+            current_char = text[i + j]
+            current_pos = i
+
+            if current_pos in {0, 4, 5}:
+                if current_char in letter_replacements:
+                    corrected_text += letter_replacements[current_char]
+                    i += 1
+                elif current_char in valid_letters:
+                    corrected_text += current_char
+                    i += 1
+                else:
+                    j += 1
+            else:
+                if current_char in valid_digits:
+                    corrected_text += current_char
+                    i += 1
+                elif current_char in digit_replacements:
+                    corrected_text += digit_replacements[current_char]
+                    i += 1
+                else:
+                    j += 1
+
+        corrected_plates_texts[plate_name] = corrected_text
+
+    return corrected_plates_texts
 
 
 def plate_inside_car(plate_coords, car_coords):
@@ -144,8 +212,8 @@ def start_result_server(path_to_result_server):
     os.system(f"start python {path_to_result_server}")
 
 
-def start_client_server(path_to_result_server):
-    os.system(f"start python {path_to_result_server}")
+def start_client_server(path_to_client_server):
+    os.system(f"start python {path_to_client_server}")
 
 
 def get_license_plate_text(path_to_license_plate):
@@ -289,6 +357,7 @@ def start_footage_processing(camera_url):
                         exit(1)
 
         corresponding_plates_texts = get_texts_from_letters(letters, plate_names_and_y_coords)
+        corresponding_plates_texts = correct_plate_texts(corresponding_plates_texts)
 
         for plate_image in plates_images:
             plate_name, img_extension = os.path.splitext(plate_image)
