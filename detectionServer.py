@@ -13,7 +13,6 @@ from os import mkdir
 
 PATH_TO_RESULT_SERVER = "ResultServer.py"
 PATH_TO_CLIENT_SERVER = "client/client_app.py"
-PATH_TO_TEXT_EXTRACTION_SERVER = "yolov5/ScreenTranslator/src/main.py"
 PATH_TO_MEDIAMTX = "mediamtx.exe"
 PATH_TO_STREAMING_FILE = "cars_test.ts"
 CAMERA_URL = 'rtsp://localhost:8554/mystream'
@@ -147,10 +146,6 @@ def start_result_server(path_to_result_server):
 
 def start_client_server(path_to_result_server):
     os.system(f"start python {path_to_result_server}")
-
-
-def start_text_extraction_server(path_to_extraction_server):
-    os.system(f"start python {path_to_extraction_server}")
 
 
 def get_license_plate_text(path_to_license_plate):
@@ -339,7 +334,6 @@ def main():
     start_camera_simualtion(PATH_TO_MEDIAMTX, PATH_TO_STREAMING_FILE)
     start_result_server(PATH_TO_RESULT_SERVER)
     start_client_server(PATH_TO_CLIENT_SERVER)
-    start_text_extraction_server(PATH_TO_TEXT_EXTRACTION_SERVER)
     makedirs()
     start_footage_processing(CAMERA_URL)
 

@@ -3,6 +3,7 @@ import uuid
 from PIL import Image
 import os
 
+
 def combine_plates(license_plates_dir):
     if not os.path.isdir(license_plates_dir):
         return "BadDirectory", []

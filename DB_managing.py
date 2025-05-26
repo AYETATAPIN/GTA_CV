@@ -1,5 +1,7 @@
 import sqlite3
+
 db_name = "cars_v2.db"
+
 
 def start_validation():
     # Удостоверились, что с базой всё в порядке
@@ -33,10 +35,11 @@ def save_photo_to_db(image_path, license_plate, date_time):  # str, str, str
     connection.commit()
     connection.close()
 
+
 def save_car_to_db(license_plate, model=None, owner=None):
     connection = sqlite3.connect(db_name)
     cursor = connection.cursor()
-    ans = cursor.execute("SELECT 1 FROM Cars WHERE license_plate = ?",(license_plate,))
+    ans = cursor.execute("SELECT 1 FROM Cars WHERE license_plate = ?", (license_plate,))
     if len(ans.fetchall()) > 0:
         cursor.execute('UPDATE Cars SET model = ?, owner = ? WHERE license_plate = ?',
                        (model, owner, license_plate))
@@ -46,6 +49,7 @@ def save_car_to_db(license_plate, model=None, owner=None):
     connection.commit()
     connection.close()
 
+
 def get_images_paths_from_db(license_plate):
     connection = sqlite3.connect(db_name)
     cursor = connection.cursor()
@@ -54,4 +58,3 @@ def get_images_paths_from_db(license_plate):
     connection.close()
     result = tuple(element[0] for element in paths)
     return result
-

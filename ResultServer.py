@@ -5,6 +5,7 @@ import datetime
 import os
 from flask import Flask, request, jsonify
 import DB_managing as db
+
 app = Flask(__name__)
 images_folder = 'coded_images'
 
@@ -18,7 +19,6 @@ def save_photo(image, license_plate, date_time):
     db.save_photo_to_db(image_path, license_plate, date_time)
 
 
-# 2 заглушки пока нет реального vae
 def vae_coding(image):
     _, coded_image = cv.imencode(".jpg", image)
     return coded_image
@@ -27,8 +27,6 @@ def vae_coding(image):
 def vae_decoding(coded_image):
     decoded_image = cv.imdecode(coded_image, cv.IMREAD_COLOR)
     return decoded_image
-
-
 
 
 def get_images(license_plate):
@@ -82,7 +80,6 @@ def save_car_request():
 
     if license_plate == "":
         return 'wrong request', 400
-
 
     db.save_car_to_db(license_plate, model, owner)
     return "Success" + "| license-plate: " + license_plate
