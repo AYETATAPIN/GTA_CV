@@ -1,0 +1,4 @@
+x
+y
+int(Enum(type)) //watch FeatureType in FeatureNode.py
+intensity
